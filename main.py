@@ -9,7 +9,7 @@ image_list = wx.ImageList(width=32, height=32, initialCount=2, mask=False)
 image_list.Add(icon=folder_icon)
 image_list.Add(icon=file_icon)
 
-frame = wx.Frame(parent=None, id=wx.ID_ANY, size=wx.Size(1080, 800), title='Title',
+frame = wx.Frame(parent=None, id=wx.ID_ANY, size=wx.Size(1095, 850), title='Title',
                  style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER)
 toolbar = frame.CreateToolBar()
 frame.Center(wx.BOTH)

@@ -14,7 +14,7 @@ frame = wx.Frame(parent=None, id=wx.ID_ANY, size=wx.Size(1080, 800), title='Titl
 toolbar = frame.CreateToolBar()
 frame.Center(wx.BOTH)
 
-left_panel = wx.Panel(parent=frame, size=wx.Size(540, 800))
+left_panel = wx.Panel(parent=frame, size=wx.Size(540, 800), style=wx.SIMPLE_BORDER)
 right_panel = wx.Panel(parent=frame, size=wx.Size(540, 800), pos=wx.Point(540, 0))
 
 file_viewer1 = FileViewer(parent=left_panel, size=wx.Size(540, 800))

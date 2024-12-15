@@ -16,6 +16,7 @@ class FileViewer(wx.ListCtrl):
     def __fill(self) -> None:
         self.ClearAll()
         files = os.listdir(self.file_system.GetPath())
+
         self.InsertItem(0, '..', 0)
 
         for index, file in enumerate(files, start=1):
@@ -25,11 +26,7 @@ class FileViewer(wx.ListCtrl):
     def open(self) -> None:
         item_label = self.GetItemText(self.GetFirstSelected())
 
-        if item_label != '..':
-            filename: str = self.file_system.FindFirst(item_label, 0)
-            filename = filename.replace('file:///', '')
-        else:
-            filename: str = self.file_system.GetPath() + '..'
+        filename: str = self.file_system.GetPath() + item_label
 
         if not pathlib.Path(filename).is_dir():
             os.startfile(filename)

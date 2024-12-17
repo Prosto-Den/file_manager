@@ -21,7 +21,6 @@ class FileViewer(wx.ListCtrl):
 
         self.__fill()
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.open())
-        self.Bind(wx.EVT_LIST_COL_CLICK, handler=lambda _: print('gneg'))
 
     def __fill(self) -> None:
         self.ClearAll()
@@ -43,6 +42,9 @@ class FileViewer(wx.ListCtrl):
         if item_label == '..':
             filename: str = self.__file_system.GetPath()
             filename_lst = filename.split('/')
+
+            if len(filename_lst) <= 2:
+                return
             filename_lst.pop(-2)
             filename = '/'.join(filename_lst)
         else:

@@ -56,10 +56,10 @@ class FileViewer(wx.ListCtrl):
             self.__file_system.ChangePathTo(filename, True)
             self.__fill()
 
-    def listdir(self, absolute: bool = False) -> list:
+    def listdir(self, is_absolute: bool = False) -> list:
         files = os.listdir(self.__file_system.GetPath())
 
-        if not absolute:
+        if not is_absolute:
             return files
         else:
             return [self.__file_system.GetPath() + file for file in files]

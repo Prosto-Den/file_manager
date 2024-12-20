@@ -2,7 +2,8 @@ import wx
 
 
 class Window(wx.Frame):
-    """Inherited from class wx.Frame
+    """
+    Inherited from class wx.Frame
         Parameters:
             parent: wx.Window - the window parent,
             id: int - the window identifier,
@@ -10,7 +11,7 @@ class Window(wx.Frame):
             pos: wx.Point - the window position,
             size: wx.Size - the window size,
             style: int - the window style,
-            name: str - the name of the window,
+            name: str - the name of the window
     """
     def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY,
                  title: str = wx.EmptyString, pos: wx.Point = wx.DefaultPosition, size: wx.Size = wx.DefaultSize,

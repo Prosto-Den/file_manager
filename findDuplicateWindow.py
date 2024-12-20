@@ -1,12 +1,11 @@
-from collections import defaultdict
-
 import wx
 import hashlib as hl
 import pathlib as pl
 from fileViewer import FileViewer
+from framework.windows import Window
 
 
-class FindDuplicateWindow(wx.Frame):
+class FindDuplicateWindow(Window):
     def __init__(self, parent: wx.Window=None, id=wx.ID_ANY, size=wx.Size(400, 200),
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
                  style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER) -> None:

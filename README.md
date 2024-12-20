@@ -10,3 +10,6 @@ File manager on Python
 4) Все необходимые библиотеки прописаны в файле requirement.txt. Установить библиотеки в среду необходимо
 при помощи команды ```pip install -r requirement.txt```;
 5) Запустить файл main.py
+
+
+Иконки для приложения взяты с сайта: https://icons8.ru/icons?ysclid=m4wovx3bb4719474001

@@ -3,6 +3,7 @@ import hashlib as hl
 import pathlib as pl
 from fileViewer import FileViewer
 from framework.windows import Window
+from settings.enums import WidgetID
 
 
 class FindDuplicateWindow(Window):
@@ -10,17 +11,21 @@ class FindDuplicateWindow(Window):
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
                  style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style)
-        self.SetBackgroundColour(wx.Colour(255, 255, 255))
 
+        self.FindWindowById(WidgetID.MAIN_WINDOW).Disable()
+        self.SetBackgroundColour(wx.Colour(255, 255, 255))
         self.__progress_bar = wx.Gauge(parent=self)
         self.__progress_bar.Center()
         self.__label = wx.StaticText(parent=self)
         self.__label.Center(wx.HORIZONTAL)
-
         self.__label.Show(True)
         self.Show(True)
         self.find_duplicates()
 
+    def __del__(self):
+        main_window: wx.Window = self.FindWindowById(WidgetID.MAIN_WINDOW)
+        main_window.Enable()
+        main_window.SetFocus()
 
     @staticmethod
     def __calc_checksum(file_path: str) -> str:
@@ -32,7 +37,7 @@ class FindDuplicateWindow(Window):
         return algorithm.hexdigest()
 
     def __get_checksums(self, file_viewer: FileViewer) -> dict[str, str]:
-        self.__label.SetLabel('bibki')
+        self.__label.SetLabel('Вычисление контрольных сумм')
         self.__label.Center(wx.HORIZONTAL)
         files = file_viewer.listdir(True)
         result = dict()
@@ -67,8 +72,8 @@ class FindDuplicateWindow(Window):
         return result
 
     def find_duplicates(self) -> None:
-        file_viewer1: FileViewer = self.FindWindowById(123)
-        file_viewer2: FileViewer = self.FindWindowById(321)
+        file_viewer1: FileViewer = self.FindWindowById(WidgetID.LEFT_FILE_VIEWER)
+        file_viewer2: FileViewer = self.FindWindowById(WidgetID.RIGHT_FILE_VIEWER)
 
         if file_viewer1.file_system.GetPath() == file_viewer2.file_system.GetPath():
             self.__progress_bar.Show(False)

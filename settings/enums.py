@@ -6,10 +6,11 @@ class ToolID(IntEnum):
 
 
 class WidgetID(IntEnum):
-    pass
+    MAIN_WINDOW = 0
+    LEFT_FILE_VIEWER = 1
+    RIGHT_FILE_VIEWER = 2
 
 
 class IconID(IntEnum):
     FOLDER_ICON_ID = 0
     FILE_ICON_ID = 1
-    FIND_DUPLICATE_ICON_ID = 2

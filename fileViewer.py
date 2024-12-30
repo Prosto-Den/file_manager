@@ -1,68 +1,60 @@
 import wx
-import os
-import pathlib
-
-
-_FILE_VIEWER_STYLE = wx.LC_REPORT | wx.LC_HRULES | wx.LC_EDIT_LABELS
+import re
+from settings import consts
+from popupmenu import PopUpMenu
+from framework.utils import FileManipulator
 
 
 class FileViewer(wx.ListCtrl):
     def __init__(self, parent: wx.Window, id: int = wx.ID_ANY, pos: wx.Point = wx.DefaultPosition,
-                 size: wx.Size = wx.DefaultSize, style: int = _FILE_VIEWER_STYLE,
+                 size: wx.Size = wx.DefaultSize, style: int = consts.FILE_VIEWER_STYLE,
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr,
-                 file_path: str = None) -> None:
+                 filepath: str = None) -> None:
         super().__init__(parent=parent, id=id, pos=pos, size=size, style=style, validator=validator, name=name)
 
-        if file_path is None:
-            file_path = os.path.dirname(__file__)
-
-        self.__file_system = wx.FileSystem()
-        self.__file_system.ChangePathTo(file_path, True)
+        self.__file_system = FileManipulator(filepath)
 
         self.__fill()
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.open())
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=self.__open)
+        self.Bind(wx.EVT_LIST_ITEM_SELECTED, handler= lambda _: PopUpMenu.destroy())
+        self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
+
+    @property
+    def file_system(self) -> FileManipulator:
+        return self.__file_system
 
     def __fill(self) -> None:
         self.ClearAll()
-        self.AppendColumn(self.__file_system.GetPath(), width=540)
 
-        self.InsertItem(0, '..', 0)
-        files = os.listdir(self.__file_system.GetPath())
+        current_path = self.__file_system.GetPath()
+        self.AppendColumn(current_path, width=540)
+        if re.match(r'\w:/\b', current_path):
+            self.InsertItem(0, '..', 0)
+
+        files = self.__file_system.listdir()
         for index, file in enumerate(files, start=1):
-            is_directory = not pathlib.Path(self.__file_system.GetPath() + file).is_dir()
+            is_directory = not self.__file_system.is_dir(self.__file_system.GetPath() + file)
             self.InsertItem(index, file, is_directory)
 
-    @property
-    def file_system(self) -> wx.FileSystem:
-        return self.__file_system
+    def __summon_popup_menu(self, event: wx.ListEvent) -> None:
+        PopUpMenu.init(self, event)
+        PopUpMenu.set_position(self.ClientToScreen(event.Point))
+        PopUpMenu.set_size(wx.Size(100, 200))
+        PopUpMenu.show()
 
-    def open(self) -> None:
+    def __open(self, _) -> None:
         item_label = self.GetItemText(self.GetFirstSelected())
 
         if item_label == '..':
             filename: str = self.__file_system.GetPath()
             filename_lst = filename.split('/')
-
-            if len(filename_lst) <= 2:
-                return
             filename_lst.pop(-2)
             filename = '/'.join(filename_lst)
         else:
             filename: str = self.__file_system.GetPath() + item_label
 
-        if not pathlib.Path(filename).is_dir():
-            os.startfile(filename)
+        if not self.__file_system.is_dir(filename):
+            self.__file_system.open_file(filename)
         else:
-            self.__file_system.ChangePathTo(filename, True)
+            self.__file_system.change_path_to(filename, True)
             self.__fill()
-
-    def listdir(self, is_absolute: bool = False) -> list:
-        files = os.listdir(self.__file_system.GetPath())
-
-        if not is_absolute:
-            return files
-        else:
-            return [self.__file_system.GetPath() + file for file in files]
-
-    def get_absolute_path(self, file: str) -> str:
-        return self.__file_system.GetPath() + file if file in self.listdir() else ''

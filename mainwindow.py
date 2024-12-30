@@ -3,13 +3,13 @@ from findDuplicateWindow import FindDuplicateWindow
 from framework.windows import Window
 from settings.enums import ToolID
 from settings.iconManipulators import ToolBarIcons
-
+from settings.consts import MAIN_WINDOW_STYLE
 
 
 class MainWindow(Window):
-    def __init__(self, parent: wx.Window=None, id: int =wx.ID_ANY, size: wx.Size=wx.Size(1095, 860),
+    def __init__(self, parent: wx.Window=None, id: int=wx.ID_ANY, size: wx.Size=wx.Size(1095, 860),
                  pos: wx.Point= wx.DefaultPosition, title='Title',
-                 style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER) -> None:
+                 style=MAIN_WINDOW_STYLE) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style)
         self.__toolbar: wx.ToolBar = self.CreateToolBar()
         toolbar_icons = ToolBarIcons(size=24, mask=False)

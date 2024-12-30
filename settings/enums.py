@@ -12,5 +12,9 @@ class WidgetID(IntEnum):
 
 
 class IconID(IntEnum):
-    FOLDER_ICON_ID = 0
-    FILE_ICON_ID = 1
+    FOLDER_ICON = 0
+    FILE_ICON = 1
+
+
+class PopUpItemsID(IntEnum):
+    DELETE_BTN = 0

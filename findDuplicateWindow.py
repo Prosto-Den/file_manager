@@ -4,12 +4,13 @@ import pathlib as pl
 from fileViewer import FileViewer
 from framework.windows import Window
 from settings.enums import WidgetID
+from settings import consts
 
 
 class FindDuplicateWindow(Window):
     def __init__(self, parent: wx.Window=None, id=wx.ID_ANY, size=wx.Size(400, 200),
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
-                 style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER) -> None:
+                 style=consts.DUPLICATE_WINDOW_STYLE) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style)
 
         self.FindWindowById(WidgetID.MAIN_WINDOW).Disable()
@@ -39,7 +40,7 @@ class FindDuplicateWindow(Window):
     def __get_checksums(self, file_viewer: FileViewer) -> dict[str, str]:
         self.__label.SetLabel('Вычисление контрольных сумм')
         self.__label.Center(wx.HORIZONTAL)
-        files = file_viewer.listdir(True)
+        files = file_viewer.file_system.listdir(True)
         result = dict()
 
         self.__progress_bar.SetRange(len(files))

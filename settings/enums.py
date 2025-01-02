@@ -9,6 +9,7 @@ class WidgetID(IntEnum):
     MAIN_WINDOW = 0
     LEFT_FILE_VIEWER = 1
     RIGHT_FILE_VIEWER = 2
+    POPUP_MENU = 3
 
 
 class IconID(IntEnum):

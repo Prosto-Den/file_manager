@@ -1,44 +1,45 @@
 import wx
 from framework.singleton import Singleton
+from settings.enums import PopUpItemsID
 
 
 class PopUpMenu(metaclass=Singleton):
-    __instance: wx.PopupWindow | None = None
-    __event: wx.ListEvent | None = None
+    __instance: wx.PopupTransientWindow | None = None
+    __filepath: str | None = None
     __menu: wx.ListCtrl | None = None
 
     @classmethod
-    def init(cls, parent: wx.Window, event: wx.ListEvent,
+    def init(cls, parent: wx.Window, filepath: str,
                  flags: int = wx.BORDER_NONE) -> None:
         if not cls.is_instance_none():
             cls.destroy()
 
-        cls.__instance = wx.PopupWindow(parent=parent, flags=flags)
-        cls.__event = event
-        print(event.GetText())
+        cls.__instance = wx.PopupTransientWindow(parent=parent, flags=flags)
+        cls.__filepath = filepath
         cls.__menu = wx.ListCtrl(parent=cls.__instance, style=wx.LC_REPORT | wx.LC_NO_HEADER)
         cls.__menu.AppendColumn('', width=100)
-        cls.__menu.InsertItem(0, 'Удалить')
-        cls.__menu.Bind(event=wx.EVT_RIGHT_DOWN, handler=cls.__test)
+        cls.__menu.InsertItem(PopUpItemsID.DELETE_BTN, 'Удалить')
+        cls.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=cls.__perform)
 
     @classmethod
-    def __test(cls, event: wx.MouseEvent):
-        print(cls.__instance)
+    def __perform(cls, event: wx.ListEvent) -> None:
+        match event.GetIndex():
+            case PopUpItemsID.DELETE_BTN:
+                cls.__instance.Parent.file_system.delete_file(cls.__filepath)
+
+        #cls.__instance.Parent.__update()
+        cls.destroy()
 
     @classmethod
-    def __test1(cls):
-        cls.__instance.Destroy()
-
-    @classmethod
-    def is_instance_none(cls):
+    def is_instance_none(cls) -> bool:
         return cls.__instance is None
 
     @classmethod
-    def destroy(cls):
+    def destroy(cls) -> None:
         if not cls.is_instance_none():
             cls.__instance.Destroy()
             cls.__instance = None
-            cls.__event = None
+            cls.__filepath = None
             cls.__menu = None
 
     @classmethod
@@ -51,5 +52,5 @@ class PopUpMenu(metaclass=Singleton):
         cls.__menu.SetSize(size)
 
     @classmethod
-    def show(cls):
+    def show(cls) -> None:
         cls.__instance.Show(True)

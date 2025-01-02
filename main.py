@@ -3,7 +3,6 @@ from fileViewer import FileViewer
 from mainwindow import MainWindow
 from settings.iconManipulators import FileViewerIcons
 from settings.enums import WidgetID
-from app import App
 
 
 app = wx.App()

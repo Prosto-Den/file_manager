@@ -1,9 +1,9 @@
-import wx
 from findDuplicateWindow import FindDuplicateWindow
 from framework.windows import Window
-from settings.enums import ToolID
+from settings.enums import ToolID, WidgetID
 from settings.iconManipulators import ToolBarIcons
 from settings.consts import MAIN_WINDOW_STYLE
+import wx
 
 
 class MainWindow(Window):

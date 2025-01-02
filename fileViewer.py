@@ -13,17 +13,17 @@ class FileViewer(wx.ListCtrl):
         super().__init__(parent=parent, id=id, pos=pos, size=size, style=style, validator=validator, name=name)
 
         self.__file_system = FileManipulator(filepath)
+        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.__update())
+        self.__update()
 
-        self.__fill()
-        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=self.__open)
-        self.Bind(wx.EVT_LIST_ITEM_SELECTED, handler= lambda _: PopUpMenu.destroy())
+        self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
 
     @property
     def file_system(self) -> FileManipulator:
         return self.__file_system
 
-    def __fill(self) -> None:
+    def __update(self) -> None:
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
@@ -37,12 +37,12 @@ class FileViewer(wx.ListCtrl):
             self.InsertItem(index, file, is_directory)
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
-        PopUpMenu.init(self, event)
+        PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText())
         PopUpMenu.set_position(self.ClientToScreen(event.Point))
         PopUpMenu.set_size(wx.Size(100, 200))
         PopUpMenu.show()
 
-    def __open(self, _) -> None:
+    def __open(self) -> None:
         item_label = self.GetItemText(self.GetFirstSelected())
 
         if item_label == '..':
@@ -57,4 +57,4 @@ class FileViewer(wx.ListCtrl):
             self.__file_system.open_file(filename)
         else:
             self.__file_system.change_path_to(filename, True)
-            self.__fill()
+            self.__update()

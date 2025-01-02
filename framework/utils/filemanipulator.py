@@ -29,6 +29,7 @@ class FileManipulator(wx.FileSystem):
     def get_absolute_path(self, file: str) -> str:
         return self.GetPath() + file if file in self.listdir() else ''
 
+    #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     def delete_file(self, filepath: str) -> None:
         if self.is_dir(filepath):
             shutil.rmtree(filepath, ignore_errors=True)

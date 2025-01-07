@@ -1,17 +1,17 @@
 import wx
 import hashlib as hl
 import pathlib as pl
-from fileViewer import FileViewer
+from widgets.fileViewer import FileViewer
 from framework.windows import Window
 from settings.enums import WidgetID
-from settings import consts
+from settings.consts import DUPLICATE_WINDOW_STYLE
 
 
 class FindDuplicateWindow(Window):
     def __init__(self, parent: wx.Window=None, id=wx.ID_ANY, size=wx.Size(400, 200),
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
-                 style=consts.DUPLICATE_WINDOW_STYLE) -> None:
-        super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style)
+                 style=DUPLICATE_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
+        super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style, name=name)
 
         self.FindWindowById(WidgetID.MAIN_WINDOW).Disable()
         self.SetBackgroundColour(wx.Colour(255, 255, 255))

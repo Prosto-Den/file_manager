@@ -37,6 +37,20 @@ class FileManipulator(wx.FileSystem):
             os.remove(filepath)
 
     @staticmethod
+    def create_folder(filepath: str) -> None:
+        os.mkdir(filepath)
+
+    @staticmethod
+    def rename_file(old_filepath: str, new_filepath: str) -> None:
+        os.rename(old_filepath, new_filepath)
+
+    @staticmethod
+    def move_file(old_filepath: str, new_filepath: str) -> None:
+        #TODO проверить
+        #Такая же логика работы у метода rename_file. Может быть, нет смысла в отдельной функции
+        shutil.move(old_filepath, new_filepath)
+
+    @staticmethod
     def open_file(filepath: str) -> None:
         os.startfile(filepath)
 
@@ -47,3 +61,7 @@ class FileManipulator(wx.FileSystem):
     @staticmethod
     def is_file(filepath: str) -> bool:
         return pl.Path(filepath).is_file()
+
+    @staticmethod
+    def get_suffix(filepath: str) -> str:
+        return pl.Path(filepath).suffix

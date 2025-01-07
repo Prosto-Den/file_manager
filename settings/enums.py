@@ -19,3 +19,4 @@ class IconID(IntEnum):
 
 class PopUpItemsID(IntEnum):
     DELETE_BTN = 0
+    RENAME_BTN = 1

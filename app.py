@@ -1,7 +1,8 @@
 import wx
-from mainwindow import MainWindow
+from windows.mainwindow import MainWindow
 
 
+# Пока что не работает
 class App(wx.App):
     def __init__(self, *, redirect: bool = False, filename: str = None,
                  use_best_visual: bool = False, clear_sig_int: bool = True) -> None:

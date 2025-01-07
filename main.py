@@ -1,14 +1,14 @@
 import wx
-from fileViewer import FileViewer
-from mainwindow import MainWindow
+from widgets.fileViewer import FileViewer
+from windows.mainwindow import MainWindow
 from settings.iconManipulators import FileViewerIcons
 from settings.enums import WidgetID
+from settings.consts import ICON_SIZE
 
 
 app = wx.App()
-fileViewerIcons = FileViewerIcons(size=24, mask=False)
-frame = MainWindow(parent=None, id=WidgetID.MAIN_WINDOW, size=wx.Size(1095, 860), title='Prosto File Manager',
-                   style=wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX)
+fileViewerIcons = FileViewerIcons(size=ICON_SIZE, mask=False)
+frame = MainWindow(id=WidgetID.MAIN_WINDOW, size=wx.Size(1095, 860), title='Prosto File Manager')
 frame.Center(wx.BOTH)
 
 toolbar_height = frame.toolbar.GetSize().height // 2 - 9

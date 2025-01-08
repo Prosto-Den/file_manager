@@ -2,6 +2,7 @@ import wx
 from framework.singleton import Singleton
 from settings.enums import PopUpItemsID
 from .renamewindow import RenameWindow
+from settings.consts import ICON_SIZE
 
 
 class PopUpMenu(metaclass=Singleton):
@@ -31,7 +32,10 @@ class PopUpMenu(metaclass=Singleton):
             case PopUpItemsID.DELETE_BTN:
                 cls.__instance.Parent.file_system.delete_file(cls.__filepath)
             case PopUpItemsID.RENAME_BTN:
-                position = cls.__instance.ClientToScreen(event.GetPoint())
+                list_ctrl: wx.ListCtrl = cls.__instance.GetParent()
+                item_position = list_ctrl.GetItemPosition(cls.__event.GetIndex())
+                position = list_ctrl.ClientToScreen(item_position)
+                position = wx.Point(position[0] + ICON_SIZE, position[1])
                 RenameWindow(cls.__instance.GetParent(), position, cls.__filepath)
 
         cls.destroy()

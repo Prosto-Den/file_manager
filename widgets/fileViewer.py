@@ -38,13 +38,11 @@ class FileViewer(wx.ListCtrl):
             self.InsertItem(index, file, is_directory)
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
-        PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText(), event)
-        PopUpMenu.set_position(self.ClientToScreen(event.GetPoint()))
-        PopUpMenu.set_size(wx.Size(*POPUP_MENU_SIZE))
-        PopUpMenu.show()
-
-    def __test(self, event) -> None:
-        print(event)
+        if event.GetIndex() != 0:
+            PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText(), event)
+            PopUpMenu.set_position(self.ClientToScreen(event.GetPoint()))
+            PopUpMenu.set_size(wx.Size(*POPUP_MENU_SIZE))
+            PopUpMenu.show()
 
     def __open(self) -> None:
         item_label = self.GetItemText(self.GetFirstSelected())

@@ -33,8 +33,10 @@ class PopUpMenu(metaclass=Singleton):
                 cls.__instance.Parent.file_system.delete_file(cls.__filepath)
             case PopUpItemsID.RENAME_BTN:
                 list_ctrl: wx.ListCtrl = cls.__instance.GetParent()
+                # получаем положение item на экране
                 item_position = list_ctrl.GetItemPosition(cls.__event.GetIndex())
-                position = list_ctrl.ClientToScreen(item_position)
+                position: wx.Point = list_ctrl.ClientToScreen(item_position)
+                # смещаем вправо на размер иконки
                 position = wx.Point(position[0] + ICON_SIZE, position[1])
                 RenameWindow(cls.__instance.GetParent(), position, cls.__filepath)
 

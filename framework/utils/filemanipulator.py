@@ -2,6 +2,7 @@ import os
 import pathlib as pl
 import wx
 import shutil
+import string
 
 
 class FileManipulator(wx.FileSystem):
@@ -65,3 +66,7 @@ class FileManipulator(wx.FileSystem):
     @staticmethod
     def get_suffix(filepath: str) -> str:
         return pl.Path(filepath).suffix
+
+    @staticmethod
+    def get_logical_drives():
+        return ['{}: '.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]

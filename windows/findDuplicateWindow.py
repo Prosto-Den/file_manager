@@ -2,12 +2,11 @@ import wx
 import hashlib as hl
 import pathlib as pl
 from widgets.fileViewer import FileViewer
-from framework.windows import Window
 from settings.enums import WidgetID
 from settings.consts import DUPLICATE_WINDOW_STYLE
 
 
-class FindDuplicateWindow(Window):
+class FindDuplicateWindow(wx.Frame):
     def __init__(self, parent: wx.Window=None, id=wx.ID_ANY, size=wx.Size(400, 200),
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
                  style=DUPLICATE_WINDOW_STYLE, name: str = wx.EmptyString) -> None:

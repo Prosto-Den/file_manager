@@ -5,6 +5,7 @@ from .renamewindow import RenameWindow
 from settings.consts import ICON_SIZE
 
 
+#TODO в singleton смысла нет, стоит переписать класс
 class PopUpMenu(metaclass=Singleton):
     __instance: wx.PopupTransientWindow | None = None
     __filepath: str | None = None
@@ -29,8 +30,10 @@ class PopUpMenu(metaclass=Singleton):
     @classmethod
     def __perform(cls, event: wx.ListEvent) -> None:
         match event.GetIndex():
+            # удаление файла
             case PopUpItemsID.DELETE_BTN:
                 cls.__instance.Parent.file_system.delete_file(cls.__filepath)
+            # переименование файла
             case PopUpItemsID.RENAME_BTN:
                 list_ctrl: wx.ListCtrl = cls.__instance.GetParent()
                 # получаем положение item на экране

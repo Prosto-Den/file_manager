@@ -12,19 +12,20 @@ class FileViewer(wx.ListCtrl):
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr,
                  filepath: str = None) -> None:
         super().__init__(parent=parent, id=id, pos=pos, size=size, style=style, validator=validator, name=name)
+        self.SetSize(parent.GetSize())
 
         self.__file_system = FileManipulator(filepath)
-        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
-        self.update()
+        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.__update())
 
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
+        self.__update()
 
     @property
     def file_system(self) -> FileManipulator:
         return self.__file_system
 
-    def update(self) -> None:
+    def __update(self) -> None:
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
@@ -38,7 +39,7 @@ class FileViewer(wx.ListCtrl):
             self.InsertItem(index, file, is_directory)
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
-        if event.GetIndex() != 0:
+        if event.GetText() != '..':
             PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText(), event)
             PopUpMenu.set_position(self.ClientToScreen(event.GetPoint()))
             PopUpMenu.set_size(wx.Size(*POPUP_MENU_SIZE))
@@ -59,4 +60,4 @@ class FileViewer(wx.ListCtrl):
             self.__file_system.open_file(filename)
         else:
             self.__file_system.change_path_to(filename, True)
-            self.update()
+            self.__update()

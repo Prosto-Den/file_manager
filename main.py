@@ -23,11 +23,12 @@ frame = MainWindow(id=WidgetID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto
 frame.Center(wx.BOTH)
 toolbar_height = frame.GetToolBar().GetSize().GetHeight() // 2 - 9
 
-#TODO может быть сделать фабрику для ControlPanel?
-left_control_panel = ControlPanel(parent=frame, size=wx.Size(540, 24), pos=wx.Point(0, toolbar_height))
-right_control_panel = ControlPanel(parent=frame, size=wx.Size(540, 24), pos=wx.Point(540, toolbar_height))
 left_panel = wx.Panel(parent=frame, size=PANEL_SIZE, pos=wx.Point(0, toolbar_height + 24))
 right_panel = wx.Panel(parent=frame, size=PANEL_SIZE, pos=wx.Point(540, toolbar_height + 24))
+left_control_panel = ControlPanel(parent=frame, id=WidgetID.LEFT_CONTROL_PANEL, size=wx.Size(540, 24),
+                                  pos=wx.Point(0, toolbar_height))
+right_control_panel = ControlPanel(parent=frame, id=WidgetID.RIGHT_CONTROL_PANEL,
+                                   size=wx.Size(540, 24), pos=wx.Point(540, toolbar_height))
 
 file_viewer1 = FileViewer(parent=left_panel, id=WidgetID.LEFT_FILE_VIEWER)
                           #filepath=r'C:\Users\Prosto_Den\Desktop')

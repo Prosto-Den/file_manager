@@ -12,6 +12,3 @@ class IconManipulator(wx.ImageList):
         for file in files:
             icon = wx.Icon(name=icons_path + '/' + file, type=wx.BITMAP_TYPE_PNG)
             self.Add(icon)
-
-    def __del__(self):
-        self.Destroy()

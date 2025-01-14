@@ -16,17 +16,17 @@ class FileViewer(wx.ListCtrl):
         self.SetSize(parent.GetSize())
 
         self.__file_system = FileManipulator(filepath)
-        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.__update())
+        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
 
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
-        self.__update()
+        self.update()
 
     @property
     def file_system(self) -> FileManipulator:
         return self.__file_system
 
-    def __update(self) -> None:
+    def update(self) -> None:
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
@@ -56,10 +56,10 @@ class FileViewer(wx.ListCtrl):
             filename_lst.pop(-2)
             filename = '/'.join(filename_lst)
         else:
-            filename: str = self.__file_system.GetPath() + item_label
+            filename: str = self.__file_system.GetPath() +  item_label
 
         if not self.__file_system.is_dir(filename):
             self.__file_system.open_file(filename)
         else:
             self.__file_system.change_path_to(filename, True)
-            self.__update()
+            self.update()

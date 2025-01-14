@@ -36,13 +36,16 @@ class IconManipulators:
                 if cls.__file_viewer_icons_manipulator is not None:
                     return cls.__file_viewer_icons_manipulator
                 raise _InitException(cls.__file_viewer_icons_manipulator)
+
             case IconManipulatorID.CONTROL_PANEL:
                 if cls.__control_panel_icons_manipulator is not None:
                     return cls.__control_panel_icons_manipulator
                 raise _InitException(cls.__control_panel_icons_manipulator)
+
             case IconManipulatorID.TOOLBAR:
                 if cls.__toolbar_icons_manipulator is not None:
                     return cls.__toolbar_icons_manipulator
                 raise _InitException(cls.__toolbar_icons_manipulator)
+
             case _:
                 raise ValueError('Не допустимый ID манипулятора!')

@@ -10,6 +10,8 @@ class WidgetID(IntEnum):
     LEFT_FILE_VIEWER = auto()
     RIGHT_FILE_VIEWER = auto()
     POPUP_MENU = auto()
+    LEFT_CONTROL_PANEL = auto()
+    RIGHT_CONTROL_PANEL = auto()
 
 
 class FileViewerIconID(IntEnum):

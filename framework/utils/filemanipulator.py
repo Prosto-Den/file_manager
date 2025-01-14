@@ -69,4 +69,4 @@ class FileManipulator(wx.FileSystem):
 
     @staticmethod
     def get_logical_drives():
-        return ['{}: '.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
+        return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]

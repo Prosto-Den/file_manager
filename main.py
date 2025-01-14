@@ -3,7 +3,8 @@ from widgets.fileViewer import FileViewer
 from widgets.controlPanel import ControlPanel
 from windows.mainwindow import MainWindow
 from settings.enums import WidgetID
-from settings.consts import MAIN_WINDOW_SIZE, PANEL_SIZE, ICON_SIZE, ICONS_PATH
+from settings.consts import (MAIN_WINDOW_SIZE, LEFT_PANEL_SIZE, RIGHT_PANEL_SIZE,
+                             ICON_SIZE, ICONS_PATH, CONTROL_PANEL_SIZE)
 from settings.iconManipulators import IconManipulators, IconManipulatorID
 
 
@@ -23,12 +24,12 @@ frame = MainWindow(id=WidgetID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto
 frame.Center(wx.BOTH)
 toolbar_height = frame.GetToolBar().GetSize().GetHeight() // 2 - 9
 
-left_panel = wx.Panel(parent=frame, size=PANEL_SIZE, pos=wx.Point(0, toolbar_height + 24))
-right_panel = wx.Panel(parent=frame, size=PANEL_SIZE, pos=wx.Point(540, toolbar_height + 24))
-left_control_panel = ControlPanel(parent=frame, id=WidgetID.LEFT_CONTROL_PANEL, size=wx.Size(540, 24),
+left_panel = wx.Panel(parent=frame, size=LEFT_PANEL_SIZE, pos=wx.Point(0, toolbar_height + 24))
+right_panel = wx.Panel(parent=frame, size=RIGHT_PANEL_SIZE, pos=wx.Point(535, toolbar_height + 24))
+left_control_panel = ControlPanel(parent=frame, id=WidgetID.LEFT_CONTROL_PANEL, size=CONTROL_PANEL_SIZE,
                                   pos=wx.Point(0, toolbar_height))
 right_control_panel = ControlPanel(parent=frame, id=WidgetID.RIGHT_CONTROL_PANEL,
-                                   size=wx.Size(540, 24), pos=wx.Point(540, toolbar_height))
+                                   size=CONTROL_PANEL_SIZE, pos=wx.Point(540, toolbar_height))
 
 file_viewer1 = FileViewer(parent=left_panel, id=WidgetID.LEFT_FILE_VIEWER)
                           #filepath=r'C:\Users\Prosto_Den\Desktop')

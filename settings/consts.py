@@ -7,9 +7,9 @@ ICONS_PATH = os.path.abspath('icons')
 # sizes
 ICON_SIZE = 24
 MAIN_WINDOW_SIZE = wx.Size(1095, 800)
-LEFT_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2 - 10, MAIN_WINDOW_SIZE.GetHeight() - 80)
-RIGHT_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeight() - 80)
-CONTROL_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, 24)
+LEFT_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeight())
+RIGHT_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeight())
+CONTROL_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, 35)
 POPUP_MENU_SIZE = wx.Size(100, 200)
 
 # styles

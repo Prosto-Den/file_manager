@@ -1,19 +1,26 @@
 import wx
 import re
-from settings import consts
+from settings.consts import FILE_VIEWER_STYLE
 from windows.popupmenu import PopUpMenu
 from framework.utils import FileManipulator
 from settings.consts import POPUP_MENU_SIZE
-from settings.enums import FileViewerIconID
+from settings.enums import FileViewerIconID, WidgetID
 
 
 class FileViewer(wx.ListCtrl):
-    def __init__(self, parent: wx.Window, id: int = wx.ID_ANY, pos: wx.Point = wx.DefaultPosition,
-                 size: wx.Size = wx.DefaultSize, style: int = consts.FILE_VIEWER_STYLE,
+    def __init__(self, parent: wx.Window, id: int = wx.ID_ANY,
+                 style: int = FILE_VIEWER_STYLE,
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr,
                  filepath: str = None) -> None:
-        super().__init__(parent=parent, id=id, pos=pos, size=size, style=style, validator=validator, name=name)
+        super().__init__(parent=parent, id=id, style=style, validator=validator, name=name)
         self.SetSize(parent.GetSize())
+        #self.SetSize(wx.Size(parent.GetSize().GetWidth() - 15, 715))
+
+        if filepath is None:
+            control_panel_id = WidgetID.LEFT_CONTROL_PANEL if self.GetId() == WidgetID.LEFT_FILE_VIEWER \
+                                                           else WidgetID.RIGHT_CONTROL_PANEL
+            control_panel = self.FindWindowById(control_panel_id)
+            filepath = control_panel.choice.GetStringSelection()
 
         self.__file_system = FileManipulator(filepath)
         self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
@@ -32,7 +39,7 @@ class FileViewer(wx.ListCtrl):
         current_path = self.__file_system.GetPath()
         self.AppendColumn(current_path, width=self.GetSize().GetWidth())
         if re.match(r'\w:/\b', current_path):
-            self.InsertItem(0, '..', FileViewerIconID.FOLDER_ICON)
+            self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
 
         files = self.__file_system.listdir()
         for index, file in enumerate(files, start=1):

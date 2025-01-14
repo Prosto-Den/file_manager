@@ -15,7 +15,8 @@ class WidgetID(IntEnum):
 
 
 class FileViewerIconID(IntEnum):
-    FILE_ICON = 0
+    BACK_ICON = 0
+    FILE_ICON = auto()
     FOLDER_ICON = auto()
 
 

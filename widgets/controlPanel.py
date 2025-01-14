@@ -12,16 +12,29 @@ class ControlPanel(wx.Panel):
                  size: wx.Size = wx.DefaultSize) -> None:
         super().__init__(parent=parent, id=id, pos=pos, size=size, style=wx.SIMPLE_BORDER)
         self.SetBackgroundColour(WHITE)
-        control_panel_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.CONTROL_PANEL)
+        sizer = wx.GridBagSizer(hgap=5)
 
+        control_panel_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.CONTROL_PANEL)
         bitmap = wx.Bitmap()
         bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.DISK_ICON))
-        self.__disk_icon = wx.StaticBitmap(parent=self, bitmap=bitmap)
-        self.__choice = wx.Choice(parent=self, pos=wx.Point(ICON_SIZE, 0),
-                                  choices=FileManipulator.get_logical_drives())
-        self.__choice.SetSelection(0)
+        disk_icon = wx.StaticBitmap(parent=self, bitmap=bitmap)
 
+        self.__choice = wx.Choice(parent=self, choices=FileManipulator.get_logical_drives())
+        bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.ADD_ICON))
+        self.__add_btn = wx.Button(parent=self, label='Создать')
+        self.__add_btn.SetBitmap(bitmap)
+        self.__add_btn.Fit()
+
+        sizer.Add(disk_icon, (0, 0), flag=wx.ALIGN_CENTRE)
+        sizer.Add(self.__choice, (0, 1), flag=wx.ALIGN_CENTRE)
+        sizer.Add(self.__add_btn, (0, 2), flag=wx.ALIGN_CENTRE)
+        # sizer.Add(self.__add_btn)
+        self.__choice.SetSelection(0)
+        sizer.Show(True)
         self.__choice.Bind(event=wx.EVT_CHOICE, handler=lambda _: self.__change_disk())
+
+        self.SetSizer(sizer)
+        self.Layout()
 
     @property
     def choice(self) -> wx.Choice:

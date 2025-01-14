@@ -14,12 +14,7 @@ IconManipulators.init(file_viewer_icons=ICONS_PATH + f'/file_viewer/{ICON_SIZE}x
                       toolbar_icons=ICONS_PATH + f'/toolbar/{ICON_SIZE}x{ICON_SIZE}',
                       size=ICON_SIZE,
                       mask=False)
-
 file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
-
-# FileViewerIcons.init(size=ICON_SIZE, mask=False)
-# ToolBarIcons.init(size=ICON_SIZE, mask=False)
-# ControlPanelIcons.init(size=ICON_SIZE, mask=False)
 frame = MainWindow(id=WidgetID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto File Manager')
 frame.Center(wx.BOTH)
 toolbar_height = frame.GetToolBar().GetSize().GetHeight() // 2 - 9
@@ -29,7 +24,7 @@ right_panel = wx.Panel(parent=frame, size=RIGHT_PANEL_SIZE, pos=wx.Point(535, to
 left_control_panel = ControlPanel(parent=frame, id=WidgetID.LEFT_CONTROL_PANEL, size=CONTROL_PANEL_SIZE,
                                   pos=wx.Point(0, toolbar_height))
 right_control_panel = ControlPanel(parent=frame, id=WidgetID.RIGHT_CONTROL_PANEL,
-                                   size=CONTROL_PANEL_SIZE, pos=wx.Point(540, toolbar_height))
+                                   size=CONTROL_PANEL_SIZE, pos=wx.Point(535, toolbar_height))
 
 file_viewer1 = FileViewer(parent=left_panel, id=WidgetID.LEFT_FILE_VIEWER)
                           #filepath=r'C:\Users\Prosto_Den\Desktop')

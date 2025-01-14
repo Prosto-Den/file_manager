@@ -1,6 +1,6 @@
 import wx
 from settings.enums import ControlPanelIconID, WidgetID
-from settings.consts import ICON_SIZE
+from settings.consts import ICON_SIZE, WHITE
 from settings.iconManipulators import IconManipulators, IconManipulatorID
 from framework.utils import FileManipulator
 from widgets.fileViewer import FileViewer
@@ -10,7 +10,8 @@ from widgets.fileViewer import FileViewer
 class ControlPanel(wx.Panel):
     def __init__(self, parent: wx.Window, id: int = wx.ID_ANY, pos: wx.Point = wx.DefaultPosition,
                  size: wx.Size = wx.DefaultSize) -> None:
-        super().__init__(parent=parent, id=id, pos=pos, size=size)
+        super().__init__(parent=parent, id=id, pos=pos, size=size, style=wx.SIMPLE_BORDER)
+        self.SetBackgroundColour(WHITE)
         control_panel_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.CONTROL_PANEL)
 
         bitmap = wx.Bitmap()

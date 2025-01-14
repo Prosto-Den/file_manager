@@ -44,7 +44,7 @@ class FileViewer(wx.ListCtrl):
         if event.GetText() != '..':
             PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText(), event)
             PopUpMenu.set_position(self.ClientToScreen(event.GetPoint()))
-            PopUpMenu.set_size(wx.Size(*POPUP_MENU_SIZE))
+            PopUpMenu.set_size(POPUP_MENU_SIZE)
             PopUpMenu.show()
 
     def __open(self) -> None:

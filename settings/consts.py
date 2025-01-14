@@ -1,8 +1,13 @@
 import wx
+import os
+
+PROJECT_PATH = os.path.dirname(os.path.abspath('main.py'))
+ICONS_PATH = os.path.abspath('icons')
 
 ICON_SIZE = 24
 MAIN_WINDOW_SIZE = wx.Size(1095, 800)
 PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeight() - 90)
+CONTROL_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, 24)
 
 FILE_VIEWER_STYLE = wx.LC_REPORT | wx.LC_HRULES | wx.LC_EDIT_LABELS #| wx.LC_NO_HEADER
 DUPLICATE_WINDOW_STYLE = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX

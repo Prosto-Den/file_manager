@@ -1,7 +1,7 @@
 from .findDuplicateWindow import FindDuplicateWindow
 from settings.enums import ToolID
-from settings.iconManipulators import ToolBarIcons
 from settings.consts import MAIN_WINDOW_STYLE
+from settings.iconManipulators import IconManipulators, IconManipulatorID
 import wx
 
 
@@ -14,7 +14,7 @@ class MainWindow(wx.Frame):
         self.__statusbar: wx.StatusBar = self.CreateStatusBar()
         status_bar_width, status_bar_height = self.__statusbar.GetSize()
         self.__statusbar.SetSize(wx.Size(status_bar_width, status_bar_height // 3))
-        toolbar_icons = ToolBarIcons(size=24, mask=False)
+        toolbar_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.TOOLBAR)
 
         btn: wx.ToolBarToolBase = self.__toolbar.CreateTool(toolId=ToolID.FIND_DUPLICATES, label='find',
                                                             bmpNormal=toolbar_icons.GetBitmap(ToolID.FIND_DUPLICATES))

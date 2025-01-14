@@ -4,6 +4,7 @@ from settings import consts
 from windows.popupmenu import PopUpMenu
 from framework.utils import FileManipulator
 from settings.consts import POPUP_MENU_SIZE
+from settings.enums import FileViewerIconID
 
 
 class FileViewer(wx.ListCtrl):
@@ -29,14 +30,15 @@ class FileViewer(wx.ListCtrl):
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
-        self.AppendColumn(current_path, width=540)
+        self.AppendColumn(current_path, width=self.GetSize().GetWidth())
         if re.match(r'\w:/\b', current_path):
-            self.InsertItem(0, '..', 0)
+            self.InsertItem(0, '..', FileViewerIconID.FOLDER_ICON)
 
         files = self.__file_system.listdir()
         for index, file in enumerate(files, start=1):
-            is_directory: bool = not self.__file_system.is_dir(self.__file_system.GetPath() + file)
-            self.InsertItem(index, file, is_directory)
+            is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
+            icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
+            self.InsertItem(index, file, icon_id)
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
         if event.GetText() != '..':

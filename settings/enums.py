@@ -1,4 +1,4 @@
-from enum import IntEnum
+from enum import IntEnum, auto
 
 
 class ToolID(IntEnum):
@@ -7,16 +7,28 @@ class ToolID(IntEnum):
 
 class WidgetID(IntEnum):
     MAIN_WINDOW = 0
-    LEFT_FILE_VIEWER = 1
-    RIGHT_FILE_VIEWER = 2
-    POPUP_MENU = 3
+    LEFT_FILE_VIEWER = auto()
+    RIGHT_FILE_VIEWER = auto()
+    POPUP_MENU = auto()
 
 
-class IconID(IntEnum):
-    FOLDER_ICON = 0
-    FILE_ICON = 1
+class FileViewerIconID(IntEnum):
+    FILE_ICON = 0
+    FOLDER_ICON = auto()
+
+
+class ControlPanelIconID(IntEnum):
+    ADD_ICON = 0
+    DISK_ICON = auto()
 
 
 class PopUpItemsID(IntEnum):
     DELETE_BTN = 0
-    RENAME_BTN = 1
+    RENAME_BTN = auto()
+    #CREATE_BTN = 2
+
+
+class IconManipulatorID(IntEnum):
+    FILE_VIEWER = 0
+    CONTROL_PANEL = auto()
+    TOOLBAR = auto()

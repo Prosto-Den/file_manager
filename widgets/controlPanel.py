@@ -1,7 +1,7 @@
 import wx
-from settings.enums import ControlPanelIconID, WidgetID
-from settings.consts import ICON_SIZE, WHITE
-from settings.iconManipulators import IconManipulators, IconManipulatorID
+from settings.enums import ControlPanelIconID, WidgetID, IconManipulatorID
+from settings.consts import WHITE
+from settings.iconManipulators import IconManipulators
 from framework.utils import FileManipulator
 from widgets.fileViewer import FileViewer
 

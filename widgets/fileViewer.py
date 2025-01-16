@@ -3,6 +3,7 @@ import re
 from settings.consts import FILE_VIEWER_STYLE
 from windows.popupmenu import PopUpMenu
 from framework.utils import FileManipulator
+from framework.events import EVT_PATH_CHANGED
 from settings.consts import POPUP_MENU_SIZE
 from settings.enums import FileViewerIconID, WidgetID
 
@@ -14,26 +15,26 @@ class FileViewer(wx.ListCtrl):
                  filepath: str = None) -> None:
         super().__init__(parent=parent, id=id, style=style, validator=validator, name=name)
         self.SetSize(parent.GetSize())
-        #self.SetSize(wx.Size(parent.GetSize().GetWidth() - 15, 715))
 
         if filepath is None:
             control_panel_id = WidgetID.LEFT_CONTROL_PANEL if self.GetId() == WidgetID.LEFT_FILE_VIEWER \
                                                            else WidgetID.RIGHT_CONTROL_PANEL
             control_panel = self.FindWindowById(control_panel_id)
-            filepath = control_panel.choice.GetStringSelection()
+            filepath = control_panel.disk
 
-        self.__file_system = FileManipulator(filepath)
-        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
-
+        self.__file_system = FileManipulator(filepath, self.GetEventHandler())
+        self.Bind(event=EVT_PATH_CHANGED, handler=lambda _: self.__update())
+        self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.__update())
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
-        self.update()
+
+        self.__update()
 
     @property
     def file_system(self) -> FileManipulator:
         return self.__file_system
 
-    def update(self) -> None:
+    def __update(self) -> None:
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
@@ -49,10 +50,10 @@ class FileViewer(wx.ListCtrl):
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
         if event.GetText() != '..':
-            PopUpMenu.init(self, self.__file_system.GetPath() + event.GetText(), event)
-            PopUpMenu.set_position(self.ClientToScreen(event.GetPoint()))
-            PopUpMenu.set_size(POPUP_MENU_SIZE)
-            PopUpMenu.show()
+            popup = PopUpMenu(self, self.__file_system.GetPath() + event.GetText(), event)
+            popup.set_position(self.ClientToScreen(event.GetPoint()))
+            popup.set_size(POPUP_MENU_SIZE)
+            popup.Show(True)
 
     def __open(self) -> None:
         item_label = self.GetItemText(self.GetFirstSelected())
@@ -69,4 +70,4 @@ class FileViewer(wx.ListCtrl):
             self.__file_system.open_file(filename)
         else:
             self.__file_system.change_path_to(filename, True)
-            self.update()
+            self.__update()

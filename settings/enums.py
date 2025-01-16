@@ -28,10 +28,14 @@ class ControlPanelIconID(IntEnum):
 class PopUpItemsID(IntEnum):
     DELETE_BTN = 0
     RENAME_BTN = auto()
-    #CREATE_BTN = 2
+    CREATE_BTN = auto()
 
 
 class IconManipulatorID(IntEnum):
     FILE_VIEWER = 0
     CONTROL_PANEL = auto()
     TOOLBAR = auto()
+
+
+class CreateItemsID(IntEnum):
+    FOLDER = 0

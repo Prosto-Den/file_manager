@@ -4,7 +4,7 @@ from settings.consts import WHITE
 from settings.iconManipulators import IconManipulators
 from framework.utils import FileManipulator
 from widgets.fileViewer import FileViewer
-
+from windows.createWindow import CreateWindow
 
 
 class ControlPanel(wx.Panel):
@@ -28,17 +28,23 @@ class ControlPanel(wx.Panel):
         sizer.Add(disk_icon, (0, 0), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__choice, (0, 1), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__add_btn, (0, 2), flag=wx.ALIGN_CENTRE)
-        # sizer.Add(self.__add_btn)
+
         self.__choice.SetSelection(0)
-        sizer.Show(True)
+        self.__choice_value: str = self.__choice.GetStringSelection()
         self.__choice.Bind(event=wx.EVT_CHOICE, handler=lambda _: self.__change_disk())
+        self.__add_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__test())
 
         self.SetSizer(sizer)
         self.Layout()
 
     @property
-    def choice(self) -> wx.Choice:
-        return self.__choice
+    def disk(self) -> str:
+        return self.__choice_value
+
+    def __test(self):
+        main_window: wx.Window = self.FindWindowById(WidgetID.MAIN_WINDOW)
+        create_window = CreateWindow()
+        main_window.PopupMenu(create_window)
 
     def __change_disk(self) -> None:
         selected_disk = self.__choice.GetStringSelection()
@@ -46,5 +52,3 @@ class ControlPanel(wx.Panel):
                                                    else WidgetID.RIGHT_FILE_VIEWER
         file_viewer: FileViewer = self.FindWindowById(file_viewer_id)
         file_viewer.file_system.change_path_to(selected_disk, True)
-        file_viewer.update()
-

@@ -3,14 +3,20 @@ import pathlib as pl
 import wx
 import shutil
 import string
+from framework.events import PathChangedEvent
 
 
 class FileManipulator(wx.FileSystem):
-    def __init__(self,  filepath: str):
+    def __init__(self,  filepath: str, event_handler: wx.EvtHandler):
         super().__init__()
         if filepath is None:
             filepath = os.path.dirname(__file__)
         self.ChangePathTo(filepath, True)
+
+        self.__event_handler = event_handler
+
+        # наблюдатель нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
+        # на изменение директории не реагирует
         self.__watcher = wx.FileSystemWatcher()
         self.__watcher.Add(filepath)
 
@@ -22,6 +28,7 @@ class FileManipulator(wx.FileSystem):
         self.__watcher.RemoveAll()
         self.ChangePathTo(location, is_dir)
         self.__watcher.Add(location)
+        wx.PostEvent(self.__event_handler, PathChangedEvent())
 
     def listdir(self, is_absolute: bool = False) -> list:
         files = os.listdir(self.GetPath())

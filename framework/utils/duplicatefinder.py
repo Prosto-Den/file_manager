@@ -1,10 +1,10 @@
-import hashlib as hl
+import hashlib as _hl
 
 
 class DuplicateFinder:
     @staticmethod
     def calc_checksum(filepath: str) -> str:
-        algorithm = hl.sha1()
+        algorithm = _hl.sha1()
 
         with open(filepath, 'rb') as file:
             algorithm.update(file.read())

@@ -1,28 +1,25 @@
 import wx
 import re
-from settings.consts import FILE_VIEWER_STYLE
+from wx.lib.mixins.listctrl import TextEditMixin
+from settings.consts import FILE_VIEWER_STYLE, FILE_VIEWER_SIZE
 from windows.popupmenu import PopUpMenu
 from framework.utils import FileManipulator
 from framework.events import EVT_PATH_CHANGED
 from settings.consts import POPUP_MENU_SIZE
 from settings.enums import FileViewerIconID, WidgetID
+from widgets.controlPanel import ControlPanel
 
 
 class FileViewer(wx.ListCtrl):
-    def __init__(self, parent: wx.Window, id: int = wx.ID_ANY,
-                 style: int = FILE_VIEWER_STYLE,
-                 validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr,
-                 filepath: str = None) -> None:
-        super().__init__(parent=parent, id=id, style=style, validator=validator, name=name)
+    def __init__(self, parent: wx.Window, filepath: str, control_panel: ControlPanel, id: int = wx.ID_ANY,
+                 style: int = FILE_VIEWER_STYLE, pos: wx.Point = wx.DefaultPosition,
+                 validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr) -> None:
+        super().__init__(parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
         self.SetSize(parent.GetSize())
 
-        if filepath is None:
-            control_panel_id = WidgetID.LEFT_CONTROL_PANEL if self.GetId() == WidgetID.LEFT_FILE_VIEWER \
-                                                           else WidgetID.RIGHT_CONTROL_PANEL
-            control_panel = self.FindWindowById(control_panel_id)
-            filepath = control_panel.disk
-
         self.__file_system = FileManipulator(filepath, self.GetEventHandler())
+        self.__related_control_panel: ControlPanel = control_panel
+
         self.Bind(event=EVT_PATH_CHANGED, handler=lambda _: self.__update())
         self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.__update())
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, handler=lambda _: self.__open())
@@ -38,7 +35,9 @@ class FileViewer(wx.ListCtrl):
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
-        self.AppendColumn(current_path, width=self.GetSize().GetWidth())
+        self.__related_control_panel.set_filepath(current_path)
+
+        self.AppendColumn('Имя файла', width=self.GetSize().GetWidth())
         if re.match(r'\w:/\b', current_path):
             self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
 
@@ -50,7 +49,7 @@ class FileViewer(wx.ListCtrl):
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
         if event.GetText() != '..':
-            popup = PopUpMenu(self, self.__file_system.GetPath() + event.GetText(), event)
+            popup = PopUpMenu(self, self.__file_system.GetPath(), event)
             popup.set_position(self.ClientToScreen(event.GetPoint()))
             popup.set_size(POPUP_MENU_SIZE)
             popup.Show(True)

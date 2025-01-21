@@ -7,11 +7,17 @@ class ToolID(IntEnum):
 
 class WidgetID(IntEnum):
     MAIN_WINDOW = 0
+    LEFT_MAIN_PANEL = auto()
     LEFT_FILE_VIEWER = auto()
+    LEFT_CONTROL_PANEL = auto()
+    RIGHT_MAIN_PANEL = auto()
     RIGHT_FILE_VIEWER = auto()
     POPUP_MENU = auto()
-    LEFT_CONTROL_PANEL = auto()
     RIGHT_CONTROL_PANEL = auto()
+
+
+class ControlPanelWidgetID(IntEnum):
+    pass
 
 
 class FileViewerIconID(IntEnum):
@@ -39,3 +45,4 @@ class IconManipulatorID(IntEnum):
 
 class CreateItemsID(IntEnum):
     FOLDER = 0
+    TEXT_FILE = auto()

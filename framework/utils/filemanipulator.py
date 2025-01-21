@@ -38,8 +38,10 @@ class FileManipulator(wx.FileSystem):
         return self.GetPath() + file if file in self.listdir() else ''
 
     #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
-    def delete_file(self, filepath: str) -> None:
-        if self.is_dir(filepath):
+    @classmethod
+    def delete_file(cls, filepath: str) -> None:
+        if cls.is_dir(filepath):
+            #TODO стоит ли добавить предупреждение о непустой папке?
             shutil.rmtree(filepath, ignore_errors=True)
         else:
             os.remove(filepath)

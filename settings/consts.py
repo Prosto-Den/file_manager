@@ -1,8 +1,12 @@
 import wx
 import os
 
+# paths
 PROJECT_PATH = os.path.dirname(os.path.abspath('main.py'))
 ICONS_PATH = os.path.abspath('icons')
+
+# time format
+TIME_FORMAT = "%d.%m.%Y %H:%M"
 
 # sizes
 ICON_SIZE = 24

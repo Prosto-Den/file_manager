@@ -1,8 +1,8 @@
 from .findDuplicateWindow import FindDuplicateWindow
-from settings.enums import ToolID, WidgetID, IconManipulatorID
+from settings.enums import ToolID, WidgetID, IconManipulatorID, CreateItemsID
 from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE
 from settings.iconManipulators import IconManipulators
-from windows.mainPanel import MainPanel
+from widgets.mainPanel import MainPanel
 import wx
 
 
@@ -21,7 +21,8 @@ class MainWindow(wx.Frame):
                                                             bmpNormal=toolbar_icons.GetBitmap(ToolID.FIND_DUPLICATES))
         self.__toolbar.AddTool(btn)
 
-        self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
+        self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE,
+                                      filepath=r'C:/Users/Prosto_Den/Desktop')
         self.__right_panel = MainPanel(parent=self, id=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
         # настраиваем FileViewer

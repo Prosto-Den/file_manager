@@ -44,7 +44,6 @@ class PopUpMenu(wx.PopupTransientWindow):
 
         self.destroy()
 
-
     def destroy(self) -> None:
         self.Show(False)
         self.Destroy()
@@ -52,10 +51,8 @@ class PopUpMenu(wx.PopupTransientWindow):
         self.__menu = None
         self.__event = None
 
-
     def set_position(self, pos: wx.Point) -> None:
         self.SetPosition(pos)
-
 
     def set_size(self, size: wx.Size) -> None:
         self.SetSize(size)

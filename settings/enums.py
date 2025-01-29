@@ -46,3 +46,8 @@ class IconManipulatorID(IntEnum):
 class CreateItemsID(IntEnum):
     FOLDER = 0
     TEXT_FILE = auto()
+
+
+class FileViewerColumns(IntEnum):
+    NAME = 0
+    CHANGE_DATE = auto()

@@ -1,6 +1,7 @@
 import wx
 from settings.iconManipulators import IconManipulators
 from settings.enums import IconManipulatorID, FileViewerIconID, CreateItemsID
+from framework.events import CreateEvent
 
 
 class CreateWindow(wx.Menu):
@@ -22,6 +23,5 @@ class CreateWindow(wx.Menu):
         self.Bind(event=wx.EVT_MENU, handler=self.__create)
 
     def __create(self, event: wx.CommandEvent):
-        match event.GetId():
-            case CreateItemsID.FOLDER:
-                pass
+        create_event = CreateEvent(type=event.GetId())
+        wx.PostEvent(self.__parent.GetEventHandler(), create_event)

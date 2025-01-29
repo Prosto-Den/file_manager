@@ -3,7 +3,7 @@ from settings.enums import ControlPanelIconID, WidgetID, IconManipulatorID
 from settings.consts import WHITE
 from settings.iconManipulators import IconManipulators
 from framework.utils import FileManipulator
-from framework.events import DiskChangedEvent
+from framework.events import DiskChangedEvent, EVT_CREATE
 from windows.createWindow import CreateWindow
 
 
@@ -14,11 +14,13 @@ class ControlPanel(wx.Panel):
         self.SetBackgroundColour(WHITE)
         sizer = wx.GridBagSizer(hgap=5)
 
+        # настраиваем иконки
         control_panel_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.CONTROL_PANEL)
         bitmap = wx.Bitmap()
         bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.DISK_ICON))
         disk_icon = wx.StaticBitmap(parent=self, bitmap=bitmap)
 
+        # настраиваем виджеты
         self.__choice = wx.Choice(parent=self, choices=FileManipulator.get_logical_drives())
         self.__choice.SetSelection(0)
         self.__choice_value: str = self.__choice.GetStringSelection()
@@ -34,17 +36,19 @@ class ControlPanel(wx.Panel):
         else:
             self.__current_filepath.SetValue(filepath)
 
+        # размещаем виджеты
         sizer.Add(disk_icon, (0, 0), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__choice, (0, 1), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__add_btn, (0, 2), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__current_filepath, (1, 0), span=wx.GBSpan(1, 29), flag=wx.EXPAND)
 
+        # реакция на события
         self.__choice.Bind(event=wx.EVT_CHOICE, handler=lambda _: self.__change_disk())
         self.__add_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__summon_create_window())
 
+        # подключаем sizer
         self.SetSizer(sizer)
         self.Layout()
-
 
     @property
     def disk(self) -> str:
@@ -59,7 +63,7 @@ class ControlPanel(wx.Panel):
 
     def __summon_create_window(self):
         main_window: wx.Window = self.FindWindowById(WidgetID.MAIN_WINDOW)
-        create_window = CreateWindow(self)
+        create_window = CreateWindow(self.GetParent())
         main_window.PopupMenu(create_window)
 
     def __change_disk(self) -> None:

@@ -1,5 +1,6 @@
 import os
 import pathlib as pl
+import re
 import wx
 import shutil
 import string
@@ -7,13 +8,13 @@ from framework.events import PathChangedEvent
 
 
 class FileManipulator(wx.FileSystem):
-    def __init__(self,  filepath: str, event_handler: wx.EvtHandler):
+    def __init__(self, filepath: str, event_handler: wx.EvtHandler):
         super().__init__()
         if filepath is None:
             filepath = os.path.dirname(__file__)
         self.ChangePathTo(filepath, True)
 
-        self.__event_handler = event_handler
+        self.__event_handler: wx.EvtHandler = event_handler
 
         # наблюдатель нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
         # на изменение директории не реагирует
@@ -26,15 +27,25 @@ class FileManipulator(wx.FileSystem):
 
     def change_path_to(self, location: str, is_dir: bool) -> None:
         self.__watcher.RemoveAll()
-        self.ChangePathTo(location, is_dir)
+        self.ChangePathTo(location, True)
         self.__watcher.Add(location)
         wx.PostEvent(self.__event_handler, PathChangedEvent())
 
-    def listdir(self, is_absolute: bool = False) -> list:
+    def listdir(self, is_absolute: bool = False) -> list[str]:
+        """
+        Возвращает список с названиями файлов, которые расположены в директории, куда указывает file manipulator в данный
+        момент.
+        :param is_absolute: Если True - возвращает список с абсолютными путями к файлам. По умолчанию False.
+        :return: Список с названиями файлов
+        """
         files = os.listdir(self.GetPath())
         return files if not is_absolute else [self.GetPath() + file for file in files]
 
     def get_absolute_path(self, file: str) -> str:
+        """Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,
+        иначе вернёт пустую строку.
+        :param file: Название файла
+        :return: абсолютный путь к файлу или пустая строка"""
         return self.GetPath() + file if file in self.listdir() else ''
 
     #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
@@ -46,8 +57,12 @@ class FileManipulator(wx.FileSystem):
         else:
             os.remove(filepath)
 
-    @staticmethod
-    def create_folder(filepath: str) -> None:
+    def create_folder(self, filepath: str) -> None:
+        files = [file for file in self.listdir() if re.match(r'Новая\sпапка\s?\d?', file)]
+        if (length := len(files)) == 0:
+            filepath = filepath + 'Новая папка'
+        else:
+            filepath = filepath + f'Новая папка {length}'
         os.mkdir(filepath)
 
     @staticmethod
@@ -79,3 +94,21 @@ class FileManipulator(wx.FileSystem):
     @staticmethod
     def get_logical_drives():
         return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
+
+    @staticmethod
+    def get_file_info(filepath: str) -> os.stat_result:
+        return pl.Path(filepath).stat()
+
+    @staticmethod
+    def convert_bytes(size: float) -> str:
+        counter = 0
+        INFO_SIZES = ('B', 'KB', 'MB', 'GB', 'TB', 'PB')
+
+        while size >= 1024:
+            size /= 1024
+            counter += 1
+
+        if counter > len(INFO_SIZES):
+            counter = len(INFO_SIZES) - 1
+
+        return f"{size:.2f} {INFO_SIZES[counter]}"

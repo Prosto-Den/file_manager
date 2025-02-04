@@ -68,8 +68,8 @@ class FileViewer(wx.ListCtrl):
         for index, (file, size, date) in enumerate(files, start=1):
             is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
+            size_as_bytes = FileSize(self.__file_system.convert_bytes(size)) if size != 0 else ''
             item_index = self.InsertItem(index, file, icon_id)
-            size_as_bytes = FileSize(self.__file_system.convert_bytes(size))
             self.SetItem(item_index, 1, str(size_as_bytes))
             self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
 

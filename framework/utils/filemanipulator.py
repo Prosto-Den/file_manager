@@ -45,17 +45,19 @@ class FileManipulator(wx.FileSystem):
         return files if not is_absolute else [self.GetPath() + file for file in files]
 
     def listdir_with_info(self, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
+        """
+        Возвращает список с названиями файлов вместе с дополнительной информацией о них (размер файла + дата последнего
+        изменения). Для папок размер всегда 0.
+        :param is_absolute: Если True - возвращает список с абсолютными путями к файлам. По умолчанию False.
+        :return: Список с названиями файлов вместе с их размерами и датами последнего изменения
+        """
         files = self.listdir(is_absolute)
         absolute_file_path = self.listdir(True)
         file_info = [self.get_file_info(file) for file in absolute_file_path]
-        sizes = [info.st_size for info in file_info]
+        sizes = [info.st_size if self.is_file(file) else 0 for file, info in zip(absolute_file_path, file_info)]
         dates = [ns_to_datetime(info.st_ctime_ns) for info in file_info]
 
-        result = []
-        for item in zip(files, sizes, dates):
-            result.append(item)
-
-        return result
+        return list(zip(files, sizes, dates))
 
 
     def get_absolute_path(self, file: str) -> str:

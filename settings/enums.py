@@ -50,4 +50,14 @@ class CreateItemsID(IntEnum):
 
 class FileViewerColumns(IntEnum):
     NAME = 0
+    SIZE = auto()
     CHANGE_DATE = auto()
+
+
+class SortFlags(IntEnum):
+    BY_NAME = 0
+    BY_NAME_DESCENDING = auto()
+    BY_SIZE = auto()
+    BY_SIZE_DESCENDING = auto()
+    BY_DATE = auto()
+    BY_DATE_DESCENDING = auto()

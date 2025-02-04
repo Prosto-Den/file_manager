@@ -5,6 +5,9 @@ import wx
 import shutil
 import string
 from framework.events import PathChangedEvent
+from .fileSize import FileSize
+from .timeFunc import ns_to_datetime
+import datetime as dt
 
 
 class FileManipulator(wx.FileSystem):
@@ -40,6 +43,20 @@ class FileManipulator(wx.FileSystem):
         """
         files = os.listdir(self.GetPath())
         return files if not is_absolute else [self.GetPath() + file for file in files]
+
+    def listdir_with_info(self, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
+        files = self.listdir(is_absolute)
+        absolute_file_path = self.listdir(True)
+        file_info = [self.get_file_info(file) for file in absolute_file_path]
+        sizes = [info.st_size for info in file_info]
+        dates = [ns_to_datetime(info.st_ctime_ns) for info in file_info]
+
+        result = []
+        for item in zip(files, sizes, dates):
+            result.append(item)
+
+        return result
+
 
     def get_absolute_path(self, file: str) -> str:
         """Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,

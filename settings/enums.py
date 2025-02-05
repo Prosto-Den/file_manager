@@ -28,7 +28,9 @@ class FileViewerIconID(IntEnum):
 
 class ControlPanelIconID(IntEnum):
     ADD_ICON = 0
+    BACK_ARROW = auto()
     DISK_ICON = auto()
+    FORWARD_ARROW = auto()
 
 
 class PopUpItemsID(IntEnum):

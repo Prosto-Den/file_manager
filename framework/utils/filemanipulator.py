@@ -5,7 +5,6 @@ import wx
 import shutil
 import string
 from framework.events import PathChangedEvent
-from .fileSize import FileSize
 from .timeFunc import ns_to_datetime
 import datetime as dt
 
@@ -28,7 +27,12 @@ class FileManipulator(wx.FileSystem):
     def watcher(self) -> wx.FileSystemWatcher:
         return self.__watcher
 
-    def change_path_to(self, location: str, is_dir: bool) -> None:
+    def change_path_to(self, location: str) -> None:
+        """
+        Меняет текущую директорию манипулятора
+        :param location: Путь к новой директории
+        :return:
+        """
         self.__watcher.RemoveAll()
         self.ChangePathTo(location, True)
         self.__watcher.Add(location)
@@ -61,15 +65,22 @@ class FileManipulator(wx.FileSystem):
 
 
     def get_absolute_path(self, file: str) -> str:
-        """Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,
+        """
+        Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,
         иначе вернёт пустую строку.
         :param file: Название файла
-        :return: абсолютный путь к файлу или пустая строка"""
+        :return: абсолютный путь к файлу или пустая строка
+        """
         return self.GetPath() + file if file in self.listdir() else ''
 
     #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     @classmethod
     def delete_file(cls, filepath: str) -> None:
+        """
+        Удаляет файл/директорию по указанному пути
+        :param filepath: Путь к файлу/директории
+        :return:
+        """
         if cls.is_dir(filepath):
             #TODO стоит ли добавить предупреждение о непустой папке?
             shutil.rmtree(filepath, ignore_errors=True)

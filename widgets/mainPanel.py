@@ -1,7 +1,7 @@
 import wx
 from widgets.controlPanel import ControlPanel
 from widgets.fileViewer import FileViewer
-from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent
+from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent, EVT_BACK
 from settings.consts import CONTROL_PANEL_SIZE
 from settings.enums import CreateItemsID
 
@@ -28,6 +28,8 @@ class MainPanel(wx.Panel):
 
         self.Bind(event=EVT_DISK_CHANGED, handler=self.__change_file_viewer_disk)
         self.Bind(event=EVT_CREATE, handler=self.__create)
+        self.Bind(event=EVT_BACK, handler=lambda _: self.__go_back())
+
 
     @property
     def control_panel(self) -> ControlPanel:
@@ -38,7 +40,13 @@ class MainPanel(wx.Panel):
         return self.__file_viewer
 
     def __change_file_viewer_disk(self, event: DiskChangedEvent) -> None:
-        self.__file_viewer.file_system.change_path_to(event.disk, True)
+        self.__file_viewer.file_system.change_path_to(event.disk)
+
+    def __go_back(self) -> None:
+        filepath: str = self.__file_viewer.file_history.GetHistoryFile(0)
+        self.__file_viewer.file_history.RemoveFileFromHistory(0)
+        self.__file_viewer.file_system.change_path_to(filepath)
+        self.__file_viewer.update()
 
     def __create(self, event: CreateEvent) -> None:
         match event.GetId():

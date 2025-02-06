@@ -8,7 +8,13 @@ class IconManipulators:
 
     @classmethod
     def init(cls, manipulator_id: int, icons_path: str, size: int, mask: bool) -> None:
-        """Инициализирует один манипулятор, если манипулятор с таким id ещё не был инициализирован"""
+        """
+        Инициализирует один манипулятор, если манипулятор с таким id ещё не был инициализирован
+        :param manipulator_id: Id манипулятора
+        :param icons_path: Путь к иконкам, которыми будет владеть манипулятор
+        :param size: Размер иконки (иконки квадратные)
+        :param mask: Использовать ли маску для иконок
+        """
         if manipulator_id in cls.__icon_manipulators.keys():
             warn('Манипулятор с таким id уже существует, перезапись не производится')
             return
@@ -26,4 +32,9 @@ class IconManipulators:
 
     @classmethod
     def get_icon_manipulator(cls, manipulator_id: int) -> _IconManipulator:
+        """
+        Получить манипулятор по его ID
+        :param manipulator_id: ID манипулятора
+        :return: Манипулятор иконок
+        """
         return cls.__icon_manipulators[manipulator_id]

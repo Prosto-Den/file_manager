@@ -1,14 +1,22 @@
-import wx
-from settings.enums import ControlPanelIconID, WidgetID, IconManipulatorID
+from __future__ import annotations
+from typing import TYPE_CHECKING
+from settings.enums import ControlPanelIconID, WindowID, WidgetID, IconManipulatorID
 from settings.consts import WHITE
-from settings.iconManipulators import IconManipulators
+from settings.iconManipulators  import IconManipulators
 from framework.utils import FileManipulator
-from framework.events import DiskChangedEvent, BackEvent
+from framework.events import DiskChangedEvent
 from windows.createWindow import CreateWindow
+import wx
+
+
+# для возвможной работы аннотации типов
+if TYPE_CHECKING:
+    from widgets.mainPanel import MainPanel
+    from widgets.fileViewer import FileViewer
 
 
 class ControlPanel(wx.Panel):
-    def __init__(self, parent: wx.Window, id: int = wx.ID_ANY, filepath: str = None,
+    def __init__(self, parent: MainPanel, id: int = wx.ID_ANY, filepath: str = None,
                  pos: wx.Point = wx.DefaultPosition, size: wx.Size = wx.DefaultSize) -> None:
         super().__init__(parent=parent, id=id, pos=pos, size=size, style=wx.SIMPLE_BORDER)
         self.SetBackgroundColour(WHITE)
@@ -37,10 +45,10 @@ class ControlPanel(wx.Panel):
         self.__back_btn.Fit()
         self.__back_btn.Disable()
         # кнопка "Вперёд"
-        bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.FORWARD_ARROW))
-        self.__forward_btn = wx.BitmapButton(parent=self, bitmap=bitmap)
-        self.__forward_btn.Disable()
-        self.__forward_btn.Fit()
+        # bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.FORWARD_ARROW))
+        # self.__forward_btn = wx.BitmapButton(parent=self, bitmap=bitmap)
+        # self.__forward_btn.Disable()
+        # self.__forward_btn.Fit()
         # строка с текущей файловой директорией
         self.__current_filepath = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
         self.__current_filepath.SetBackgroundColour(WHITE)
@@ -55,7 +63,7 @@ class ControlPanel(wx.Panel):
         sizer.Add(self.__choice, (0, 1), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__add_btn, (0, 2), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__back_btn, (0, 3), flag=wx.ALIGN_CENTRE)
-        sizer.Add(self.__forward_btn, (0, 4), flag=wx.ALIGN_CENTRE)
+        #sizer.Add(self.__forward_btn, (0, 4), flag=wx.ALIGN_CENTRE)
         sizer.Add(self.__current_filepath, (1, 0), span=wx.GBSpan(1, 29), flag=wx.EXPAND)
 
         # реакция на события
@@ -69,10 +77,18 @@ class ControlPanel(wx.Panel):
 
     @property
     def disk(self) -> str:
+        """
+        Получить диск, выбранный из выпадающего меню
+        :return: Выбранный диск
+        """
         return self.__choice_value
 
     @property
     def current_filepath(self) -> str:
+        """
+        Получить путь к текущей директории
+        :return: Строка с текущей директорий
+        """
         return self.__current_filepath.GetValue()
 
     def set_filepath(self, filepath: str) -> None:
@@ -84,8 +100,8 @@ class ControlPanel(wx.Panel):
     def block_btn(self) -> None:
         self.__back_btn.Disable()
 
-    def __summon_create_window(self):
-        main_window: wx.Window = self.FindWindowById(WidgetID.MAIN_WINDOW)
+    def __summon_create_window(self) -> None:
+        main_window: wx.Window = self.FindWindowById(WindowID.MAIN_WINDOW)
         create_window = CreateWindow(self.GetParent())
         main_window.PopupMenu(create_window)
 
@@ -96,6 +112,9 @@ class ControlPanel(wx.Panel):
         wx.PostEvent(parent.GetEventHandler(), event)
 
     def __back(self) -> None:
-        event = BackEvent()
-        parent: wx.Window = self.GetParent()
-        wx.PostEvent(parent.GetEventHandler(), event)
+        parent: MainPanel = self.GetParent()
+        file_viewer: FileViewer = parent.get_widget(WidgetID.FILE_VIEWER)
+        filepath: str = file_viewer.file_history.GetHistoryFile(0)
+        file_viewer.file_history.RemoveFileFromHistory(0)
+        file_viewer.file_system.change_path_to(filepath)
+        file_viewer.update()

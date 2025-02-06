@@ -1,19 +1,27 @@
-import wx
-import hashlib as hl
-import pathlib as pl
+from __future__ import annotations
 from widgets.fileViewer import FileViewer
-from settings.enums import WidgetID
-from settings.consts import DUPLICATE_WINDOW_STYLE
+from settings.enums import WidgetID, WindowID
+from settings.consts import DUPLICATE_WINDOW_STYLE, WHITE
+from typing import TYPE_CHECKING
+from widgets.mainPanel import MainPanel
+import pathlib as pl
+import hashlib as hl
+import wx
+
+
+
+if TYPE_CHECKING:
+    from windows.mainwindow import MainWindow
 
 
 class FindDuplicateWindow(wx.Frame):
-    def __init__(self, parent: wx.Window=None, id=wx.ID_ANY, size=wx.Size(400, 200),
+    def __init__(self, parent: wx.Window=None, id=WindowID.DUPLICATE_WINDOW, size=wx.DefaultSize,
                  pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
                  style=DUPLICATE_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style, name=name)
 
-        self.FindWindowById(WidgetID.MAIN_WINDOW).Disable()
-        self.SetBackgroundColour(wx.Colour(255, 255, 255))
+        self.FindWindowById(WindowID.MAIN_WINDOW).Disable()
+        self.SetBackgroundColour(WHITE)
         self.__progress_bar = wx.Gauge(parent=self)
         self.__progress_bar.Center()
         self.__label = wx.StaticText(parent=self)
@@ -23,7 +31,7 @@ class FindDuplicateWindow(wx.Frame):
         self.find_duplicates()
 
     def __del__(self):
-        main_window: wx.Window = self.FindWindowById(WidgetID.MAIN_WINDOW)
+        main_window: wx.Window = self.FindWindowById(WindowID.MAIN_WINDOW)
         main_window.Enable()
         main_window.SetFocus()
 
@@ -72,8 +80,11 @@ class FindDuplicateWindow(wx.Frame):
         return result
 
     def find_duplicates(self) -> None:
-        file_viewer1: FileViewer = self.FindWindowById(WidgetID.LEFT_FILE_VIEWER)
-        file_viewer2: FileViewer = self.FindWindowById(WidgetID.RIGHT_FILE_VIEWER)
+        parent: MainWindow = self.GetParent()
+        left_panel: MainPanel = parent.get_widget(WidgetID.LEFT_MAIN_PANEL)
+        right_panel: MainPanel = parent.get_widget(WidgetID.RIGHT_MAIN_PANEL)
+        file_viewer1: FileViewer = left_panel.get_widget(WidgetID.FILE_VIEWER)
+        file_viewer2: FileViewer = right_panel.get_widget(WidgetID.FILE_VIEWER)
 
         if file_viewer1.file_system.GetPath() == file_viewer2.file_system.GetPath():
             self.__progress_bar.Show(False)

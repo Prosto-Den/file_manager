@@ -1,13 +1,14 @@
 from .findDuplicateWindow import FindDuplicateWindow
-from settings.enums import ToolID, WidgetID, IconManipulatorID, CreateItemsID
-from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE
+from settings.enums import ToolID, WidgetID, IconManipulatorID
+from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE, WIDGET, DUPLICATE_WINDOW_SIZE
 from settings.iconManipulators import IconManipulators
 from widgets.mainPanel import MainPanel
+from widgets.fileViewer import FileViewer
 import wx
 
 
 class MainWindow(wx.Frame):
-    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY, size: wx.Size = wx.Size(1095, 860),
+    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY, size: wx.Size = wx.DefaultSize,
                  pos: wx.Point = wx.DefaultPosition, title: str = 'Title',
                  style=MAIN_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style, name=name)
@@ -21,14 +22,17 @@ class MainWindow(wx.Frame):
                                                             bmpNormal=toolbar_icons.GetBitmap(ToolID.FIND_DUPLICATES))
         self.__toolbar.AddTool(btn)
 
+        # создаём панели с виджетами
         self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE,
                                       filepath=r'C:/Users/Prosto_Den/Desktop')
         self.__right_panel = MainPanel(parent=self, id=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
         # настраиваем FileViewer
         file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
-        self.__left_panel.file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
-        self.__right_panel.file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
+        file_viewer: FileViewer = self.__left_panel.get_widget(WidgetID.FILE_VIEWER)
+        file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
+        file_viewer = self.__right_panel.get_widget(WidgetID.FILE_VIEWER)
+        file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
 
         # настраиваем статус бар
         #self.__statusbar: wx.StatusBar = self.CreateStatusBar()
@@ -48,10 +52,16 @@ class MainWindow(wx.Frame):
         self.Layout()
 
     def show(self) -> None:
+        """
+        Отобразить окно
+        """
         self.Center()
         self.Show(True)
         self.__toolbar.Realize()
         #self.__statusbar.Show(True)
 
+    def get_widget(self, widget_id: int) -> WIDGET:
+        return self.FindWindowById(widget_id, self)
+
     def __find_duplicates(self) -> None:
-        FindDuplicateWindow()
+        FindDuplicateWindow(parent=self, size=DUPLICATE_WINDOW_SIZE)

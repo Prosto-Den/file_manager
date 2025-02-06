@@ -95,6 +95,17 @@ class FileManipulator(wx.FileSystem):
             filepath = filepath + f'Новая папка {length}'
         os.mkdir(filepath)
 
+    def create_file(self, filepath: str, file_format_code: str) -> None:
+        files = [file for file in self.listdir() if re.match(rf'Документ\s?\d?{file_format_code}', file)]
+
+        if (length := len(files)) == 0:
+            filepath = filepath + 'Документ' + file_format_code
+        else:
+            filepath = filepath + f'Документ {length}' + file_format_code
+
+        file = open(filepath, 'w')
+        file.close()
+
     @staticmethod
     def rename_file(old_filepath: str, new_filepath: str) -> None:
         os.rename(old_filepath, new_filepath)
@@ -122,7 +133,7 @@ class FileManipulator(wx.FileSystem):
         return pl.Path(filepath).suffix
 
     @staticmethod
-    def get_logical_drives():
+    def get_logical_drives() -> list[str]:
         return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
 
     @staticmethod

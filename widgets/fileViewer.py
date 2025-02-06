@@ -1,21 +1,25 @@
-import wx
-import re
-
-from wx.lib.agw.flatmenu import FileHistory
-
+from __future__ import annotations
+from typing import TYPE_CHECKING
 from settings.consts import FILE_VIEWER_STYLE
 from windows.popupmenu import PopUpMenu
+from windows.warningWindow import WarningWindow
 from framework.utils import FileManipulator
-from framework.events import EVT_PATH_CHANGED, EVT_BACK
-from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
-from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags
+from framework.events import EVT_PATH_CHANGED
+from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT, WARNING_WINDOW_SIZE
+from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, WidgetID
 from widgets.controlPanel import ControlPanel
 from framework.utils.fileSize import FileSize
 import datetime as dt
+import wx
+import re
+
+
+if TYPE_CHECKING:
+    from widgets.mainPanel import MainPanel
 
 
 class FileViewer(wx.ListCtrl):
-    def __init__(self, parent: wx.Window, filepath: str, control_panel: ControlPanel, id: int = wx.ID_ANY,
+    def __init__(self, parent: MainPanel, filepath: str, id: int = wx.ID_ANY,
                  style: int = FILE_VIEWER_STYLE, pos: wx.Point = wx.DefaultPosition,
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr) -> None:
         wx.ListCtrl.__init__(self, parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
@@ -24,14 +28,13 @@ class FileViewer(wx.ListCtrl):
 
         self.__file_system = FileManipulator(filepath, self.GetEventHandler())
         self.__file_history = wx.FileHistory()
-        self.__related_control_panel: ControlPanel = control_panel
         self.__sort_flag = SortFlags.BY_NAME
 
         self.Bind(event=EVT_PATH_CHANGED, handler=lambda _: self.update())
         self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
-        self.Bind(wx.EVT_LIST_COL_CLICK, self.__do_sort)
+        self.Bind(wx.EVT_LIST_COL_CLICK, self.__change_sort_flag)
 
         self.update()
 
@@ -40,7 +43,7 @@ class FileViewer(wx.ListCtrl):
         return self.__file_system
 
     @property
-    def file_history(self) -> FileHistory:
+    def file_history(self) -> wx.FileHistory:
         return self.__file_history
 
     def __create_columns(self) -> None:
@@ -84,17 +87,17 @@ class FileViewer(wx.ListCtrl):
             self.__file_system.change_path_to(filename)
             self.update()
 
-    def __do_sort(self, event: wx.ListEvent) -> None:
+    def __change_sort_flag(self, event: wx.ListEvent) -> None:
         match event.GetColumn():
             case FileViewerColumns.NAME:
                 self.__sort_flag = SortFlags.BY_NAME_DESCENDING if self.__sort_flag == SortFlags.BY_NAME \
-                    else self.__sort_flag.BY_NAME
+                                                                else self.__sort_flag.BY_NAME
             case FileViewerColumns.SIZE:
                 self.__sort_flag = SortFlags.BY_SIZE_DESCENDING if self.__sort_flag == SortFlags.BY_SIZE \
-                    else self.__sort_flag.BY_SIZE
+                                                                else self.__sort_flag.BY_SIZE
             case FileViewerColumns.CHANGE_DATE:
                 self.__sort_flag = SortFlags.BY_DATE_DESCENDING if self.__sort_flag == SortFlags.BY_DATE \
-                    else self.__sort_flag.BY_DATE
+                                                                else self.__sort_flag.BY_DATE
 
         self.update()
 
@@ -116,13 +119,16 @@ class FileViewer(wx.ListCtrl):
     def update(self) -> None:
         self.ClearAll()
 
+        parent: MainPanel = self.GetParent()
+        control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
+
         if self.__file_history.GetCount() > 0:
-            self.__related_control_panel.unblock_btn()
+            control_panel.unblock_btn()
         else:
-            self.__related_control_panel.block_btn()
+            control_panel.block_btn()
 
         current_path = self.__file_system.GetPath()
-        self.__related_control_panel.set_filepath(current_path)
+        control_panel.set_filepath(current_path)
 
         self.__create_columns()
         if re.match(r'\w:/\b', current_path):
@@ -135,7 +141,8 @@ class FileViewer(wx.ListCtrl):
         for index, (file, size, date) in enumerate(files, start=1):
             is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
-            size_as_bytes = FileSize(self.__file_system.convert_bytes(size)) if size != 0 else ''
+            size_as_bytes = self.__file_system.convert_bytes(size) if not is_directory else ''
+
             item_index = self.InsertItem(index, file, icon_id)
             self.SetItem(item_index, 1, str(size_as_bytes))
             self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))

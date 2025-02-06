@@ -1,9 +1,9 @@
 import wx
 from widgets.controlPanel import ControlPanel
 from widgets.fileViewer import FileViewer
-from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent, EVT_BACK
-from settings.consts import CONTROL_PANEL_SIZE
-from settings.enums import CreateItemsID
+from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent
+from settings.consts import CONTROL_PANEL_SIZE, WIDGET
+from settings.enums import CreateItemsID, WidgetID, FileFormatID
 
 
 class MainPanel(wx.Panel):
@@ -16,9 +16,10 @@ class MainPanel(wx.Panel):
         sizer.AddGrowableRow(idx=1)
 
         # виджеты
-        self.__control_panel = ControlPanel(parent=self, size=CONTROL_PANEL_SIZE, filepath=filepath)
+        self.__control_panel = ControlPanel(parent=self, size=CONTROL_PANEL_SIZE, filepath=filepath,
+                                            id=WidgetID.CONTROL_PANEL)
         self.__file_viewer = FileViewer(parent=self, filepath=self.__control_panel.current_filepath,
-                                        control_panel=self.__control_panel)
+                                        id=WidgetID.FILE_VIEWER)
 
         # размещение виджетов
         sizer.Add(self.__control_panel)
@@ -28,27 +29,22 @@ class MainPanel(wx.Panel):
 
         self.Bind(event=EVT_DISK_CHANGED, handler=self.__change_file_viewer_disk)
         self.Bind(event=EVT_CREATE, handler=self.__create)
-        self.Bind(event=EVT_BACK, handler=lambda _: self.__go_back())
 
-
-    @property
-    def control_panel(self) -> ControlPanel:
-        return self.__control_panel
-
-    @property
-    def file_viewer(self) -> FileViewer:
-        return self.__file_viewer
+    def get_widget(self, widget_id: int) -> WIDGET:
+        return self.FindWindowById(widget_id, self)
 
     def __change_file_viewer_disk(self, event: DiskChangedEvent) -> None:
         self.__file_viewer.file_system.change_path_to(event.disk)
 
-    def __go_back(self) -> None:
-        filepath: str = self.__file_viewer.file_history.GetHistoryFile(0)
-        self.__file_viewer.file_history.RemoveFileFromHistory(0)
-        self.__file_viewer.file_system.change_path_to(filepath)
-        self.__file_viewer.update()
-
     def __create(self, event: CreateEvent) -> None:
-        match event.GetId():
-            case CreateItemsID.FOLDER:
-                self.__file_viewer.file_system.create_folder(self.__control_panel.current_filepath)
+        if event.type == CreateItemsID.FOLDER:
+            self.__file_viewer.file_system.create_folder(self.__control_panel.current_filepath)
+        else:
+            self.__file_viewer.file_system.create_file(self.__control_panel.current_filepath, event.file_type)
+        # match event.type:
+        #     case CreateItemsID.FOLDER:
+        #         self.__file_viewer.file_system.create_folder(self.__control_panel.current_filepath)
+        #     case CreateItemsID.TEXT_FILE:
+        #         self.__file_viewer.file_system.create_file(self.__control_panel.current_filepath, FileFormatID.TXT)
+        #     case CreateItemsID.DOCS_FILE:
+        #         self.__file_viewer.file_system.create_file(self.__control_panel.current_filepath, FileFormatID.DOCS)

@@ -1,19 +1,21 @@
-from enum import IntEnum, auto
+from enum import IntEnum, StrEnum, auto
 
 
 class ToolID(IntEnum):
     FIND_DUPLICATES = 0
 
 
-class WidgetID(IntEnum):
+class WindowID(IntEnum):
     MAIN_WINDOW = 0
-    LEFT_MAIN_PANEL = auto()
-    LEFT_FILE_VIEWER = auto()
-    LEFT_CONTROL_PANEL = auto()
+    DUPLICATE_WINDOW = auto()
+
+
+class WidgetID(IntEnum):
+    LEFT_MAIN_PANEL = 0
     RIGHT_MAIN_PANEL = auto()
-    RIGHT_FILE_VIEWER = auto()
+    FILE_VIEWER = auto()
+    CONTROL_PANEL = auto()
     POPUP_MENU = auto()
-    RIGHT_CONTROL_PANEL = auto()
 
 
 class ControlPanelWidgetID(IntEnum):
@@ -24,6 +26,8 @@ class FileViewerIconID(IntEnum):
     BACK_ICON = 0
     FILE_ICON = auto()
     FOLDER_ICON = auto()
+    TEXT_FILE_ICON = auto()
+    WORD_FILE_ICON = auto()
 
 
 class ControlPanelIconID(IntEnum):
@@ -43,11 +47,13 @@ class IconManipulatorID(IntEnum):
     FILE_VIEWER = 0
     CONTROL_PANEL = auto()
     TOOLBAR = auto()
+    SYSTEM = auto()
 
 
 class CreateItemsID(IntEnum):
     FOLDER = 0
     TEXT_FILE = auto()
+    DOCX_FILE = auto()
 
 
 class FileViewerColumns(IntEnum):
@@ -63,3 +69,8 @@ class SortFlags(IntEnum):
     BY_SIZE_DESCENDING = auto()
     BY_DATE = auto()
     BY_DATE_DESCENDING = auto()
+
+
+class FileFormatID(StrEnum):
+    TXT = '.txt'
+    DOCX = '.docx'

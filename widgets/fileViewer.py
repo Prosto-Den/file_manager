@@ -2,13 +2,11 @@ from __future__ import annotations
 from typing import TYPE_CHECKING
 from settings.consts import FILE_VIEWER_STYLE
 from windows.popupmenu import PopUpMenu
-from windows.warningWindow import WarningWindow
 from framework.utils import FileManipulator
 from framework.events import EVT_PATH_CHANGED
-from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT, WARNING_WINDOW_SIZE
+from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
 from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, WidgetID
 from widgets.controlPanel import ControlPanel
-from framework.utils.fileSize import FileSize
 import datetime as dt
 import wx
 import re

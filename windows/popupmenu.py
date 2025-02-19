@@ -1,7 +1,8 @@
 import wx
 from settings.enums import PopUpItemsID
 from .renamewindow import RenameWindow
-from settings.consts import ICON_SIZE
+from .moveFileWindow import MoveFileWindow
+from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
 from framework.utils import FileManipulator
 
 
@@ -16,6 +17,7 @@ class PopUpMenu(wx.PopupTransientWindow):
         self.__menu.AppendColumn('', width=100)
         self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, 'Удалить')
         self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, 'Переименовать')
+        self.__menu.InsertItem(PopUpItemsID.MOVE_BTN, 'Переместить')
         #self.__menu.InsertItem(PopUpItemsID.CREATE_BTN, 'Создать')
 
         self.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=self.__perform)
@@ -41,6 +43,8 @@ class PopUpMenu(wx.PopupTransientWindow):
                 # смещаем вправо на размер иконки
                 position = wx.Point(position[0] + ICON_SIZE, position[1])
                 RenameWindow(self.GetParent(), position, self.__filepath + '/' + self.__event.GetText())
+            case PopUpItemsID.MOVE_BTN:
+                MoveFileWindow(parent=self.GetParent(), size=MOVE_WINDOW_SIZE)
 
         self.destroy()
 

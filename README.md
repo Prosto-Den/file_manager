@@ -1,4 +1,4 @@
-# file_manager
+# Prosto File Manager
 File manager on Python
 
 

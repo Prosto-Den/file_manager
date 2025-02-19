@@ -24,7 +24,7 @@ class FileViewer(wx.ListCtrl):
 
         self.SetSize(parent.GetSize())
 
-        self.__file_system = FileManipulator(filepath, self.GetEventHandler())
+        self.__file_system = FileManipulator(self, filepath)
         self.__file_history = wx.FileHistory()
         self.__sort_flag = SortFlags.BY_NAME
 

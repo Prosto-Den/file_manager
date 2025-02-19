@@ -1,3 +1,4 @@
+# скорее всего уже не нужен
 class FileSize:
     def __init__(self, file_size: str) -> None:
         if file_size == '':

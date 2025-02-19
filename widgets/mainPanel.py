@@ -1,4 +1,5 @@
 import wx
+from framework.utils import FileManipulator
 from widgets.controlPanel import ControlPanel
 from widgets.fileViewer import FileViewer
 from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent
@@ -32,6 +33,14 @@ class MainPanel(wx.Panel):
 
     def get_widget(self, widget_id: int) -> WIDGET:
         return self.FindWindowById(widget_id, self)
+
+    @property
+    def current_filepath(self) -> str:
+        return self.__control_panel.current_filepath
+
+    @property
+    def file_system(self) -> FileManipulator:
+        return self.__file_viewer.file_system
 
     def __change_file_viewer_disk(self, event: DiskChangedEvent) -> None:
         self.__file_viewer.file_system.change_path_to(event.disk)

@@ -1,22 +1,23 @@
+from framework.events import PathChangedEvent
+from .timeFunc import ns_to_datetime
 import os
-import pathlib as pl
+import hashlib as hl
 import re
 import wx
 import shutil
 import string
-from framework.events import PathChangedEvent
-from .timeFunc import ns_to_datetime
 import datetime as dt
 
 
 class FileManipulator(wx.FileSystem):
-    def __init__(self, filepath: str, event_handler: wx.EvtHandler):
+    def __init__(self, parent: wx.Window, filepath: str):
         super().__init__()
+
         if filepath is None:
             filepath = os.path.dirname(__file__)
         self.ChangePathTo(filepath, True)
 
-        self.__event_handler: wx.EvtHandler = event_handler
+        self.__event_handler: wx.EvtHandler = parent.GetEventHandler()
 
         # наблюдатель нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
         # на изменение директории не реагирует
@@ -46,7 +47,7 @@ class FileManipulator(wx.FileSystem):
         :return: Список с названиями файлов
         """
         files = os.listdir(self.GetPath())
-        return files if not is_absolute else [self.GetPath() + file for file in files]
+        return files if not is_absolute else [os.path.join(self.GetPath(), file) for file in files]
 
     def listdir_with_info(self, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
         """
@@ -63,7 +64,6 @@ class FileManipulator(wx.FileSystem):
 
         return list(zip(files, sizes, dates))
 
-
     def get_absolute_path(self, file: str) -> str:
         """
         Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,
@@ -71,7 +71,15 @@ class FileManipulator(wx.FileSystem):
         :param file: Название файла
         :return: абсолютный путь к файлу или пустая строка
         """
-        return self.GetPath() + file if file in self.listdir() else ''
+        return os.path.join(self.GetPath(), file) if file in self.listdir() else ''
+
+    #TODO пока не готово
+    def get_checksums(self) -> dict[str, str]:
+        """
+        Получить контрольные суммы для всех файлов в директории и поддиректориях
+        :return: ???
+        """
+        pass
 
     #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     @classmethod
@@ -90,18 +98,18 @@ class FileManipulator(wx.FileSystem):
     def create_folder(self, filepath: str) -> None:
         files = [file for file in self.listdir() if re.match(r'Новая\sпапка\s?\d?', file)]
         if (length := len(files)) == 0:
-            filepath = filepath + 'Новая папка'
+            filepath = os.path.join(filepath, 'Новая папка')
         else:
-            filepath = filepath + f'Новая папка {length}'
+            filepath = os.path.join(filepath, f'Новая папка {length}')
         os.mkdir(filepath)
 
     def create_file(self, filepath: str, file_format_code: str) -> None:
         files = [file for file in self.listdir() if re.match(rf'Документ\s?\d?{file_format_code}', file)]
 
         if (length := len(files)) == 0:
-            filepath = filepath + 'Документ' + file_format_code
+            filepath = os.path.join(filepath, ''.join(('Документ', file_format_code)))
         else:
-            filepath = filepath + f'Документ {length}' + file_format_code
+            filepath = os.path.join(filepath, ''.join((f'Документ {length}', file_format_code)))
 
         file = open(filepath, 'w')
         file.close()
@@ -122,15 +130,11 @@ class FileManipulator(wx.FileSystem):
 
     @staticmethod
     def is_dir(filepath: str) -> bool:
-        return pl.Path(filepath).is_dir()
+        return os.path.isdir(filepath)
 
     @staticmethod
     def is_file(filepath: str) -> bool:
-        return pl.Path(filepath).is_file()
-
-    @staticmethod
-    def get_suffix(filepath: str) -> str:
-        return pl.Path(filepath).suffix
+        return os.path.isfile(filepath)
 
     @staticmethod
     def get_logical_drives() -> list[str]:
@@ -138,18 +142,25 @@ class FileManipulator(wx.FileSystem):
 
     @staticmethod
     def get_file_info(filepath: str) -> os.stat_result:
-        return pl.Path(filepath).stat()
+        return os.stat(filepath)
 
     @staticmethod
     def convert_bytes(size: float) -> str:
         counter = 0
         INFO_SIZES = ('B', 'KB', 'MB', 'GB', 'TB', 'PB')
 
-        while size >= 1024:
+        while size >= 1024 and counter < len(INFO_SIZES) - 1:
             size /= 1024
             counter += 1
 
-        if counter > len(INFO_SIZES):
-            counter = len(INFO_SIZES) - 1
-
         return f"{size:.2f} {INFO_SIZES[counter]}"
+
+    @staticmethod
+    def calc_checksum(file_path: str) -> str:
+        algorithm = hl.sha1()
+
+        with open(file_path, 'rb') as file:
+            algorithm.update(file.read())
+
+        return algorithm.hexdigest()
+

@@ -52,9 +52,6 @@ class MainWindow(wx.Frame):
         self.Layout()
 
     def show(self) -> None:
-        """
-        Отобразить окно
-        """
         self.Center()
         self.Show(True)
         self.__toolbar.Realize()

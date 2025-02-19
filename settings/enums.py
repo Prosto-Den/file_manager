@@ -40,7 +40,8 @@ class ControlPanelIconID(IntEnum):
 class PopUpItemsID(IntEnum):
     DELETE_BTN = 0
     RENAME_BTN = auto()
-    CREATE_BTN = auto()
+    MOVE_BTN = auto()
+    COPY_BTN = auto()
 
 
 class IconManipulatorID(IntEnum):

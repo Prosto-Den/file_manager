@@ -23,7 +23,6 @@ class CreateWindow(wx.Menu):
         bitmap.CopyFromIcon(icons.GetIcon(FileViewerIconID.WORD_FILE_ICON))
         create_docx.SetBitmap(bitmap)
 
-
         self.Append(create_folder)
         self.Append(create_file)
         self.Append(create_docx)

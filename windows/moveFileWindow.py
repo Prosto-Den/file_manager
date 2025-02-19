@@ -8,3 +8,9 @@ class MoveFileWindow(wx.Frame):
         super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style, name=name)
 
         self.__current_file = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
+        self.__tre_view = wx.TreeCtrl(parent=self)
+
+        self.Show()
+
+    def __fill_tree_view(self):
+        pass

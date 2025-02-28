@@ -82,29 +82,25 @@ class FileManipulator(wx.FileSystem):
         pass
 
     #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
-    @classmethod
-    def delete_file(cls, filepath: str) -> None:
+    def create_folder(self) -> None:
         """
-        Удаляет файл/директорию по указанному пути
-        :param filepath: Путь к файлу/директории
-        :return:
+        Создаёт папку в директории, на которую указывает манипулятор
         """
-        if cls.is_dir(filepath):
-            #TODO стоит ли добавить предупреждение о непустой папке?
-            shutil.rmtree(filepath, ignore_errors=True)
-        else:
-            os.remove(filepath)
-
-    def create_folder(self, filepath: str) -> None:
         files = [file for file in self.listdir() if re.match(r'Новая\sпапка\s?\d?', file)]
+        filepath = self.GetPath()
         if (length := len(files)) == 0:
             filepath = os.path.join(filepath, 'Новая папка')
         else:
             filepath = os.path.join(filepath, f'Новая папка {length}')
         os.mkdir(filepath)
 
-    def create_file(self, filepath: str, file_format_code: str) -> None:
+    def create_file(self, file_format_code: str) -> None:
+        """
+        Создаёт файл в директории, на которую указывает манипулятор с заданным расширением
+        :param file_format_code: Расширение файла
+        """
         files = [file for file in self.listdir() if re.match(rf'Документ\s?\d?{file_format_code}', file)]
+        filepath = self.GetPath()
 
         if (length := len(files)) == 0:
             filepath = os.path.join(filepath, ''.join(('Документ', file_format_code)))
@@ -113,6 +109,31 @@ class FileManipulator(wx.FileSystem):
 
         file = open(filepath, 'w')
         file.close()
+
+    def get_total_file_amount(self) -> int:
+        """
+        Рекурсивно вычисляет количество файлов в директории и поддиректориях
+        :return: Количество файлов
+        """
+        result = 0
+
+        for _, _, files in os.walk(self.GetPath()):
+            result += len(files)
+
+        return result
+
+    @classmethod
+    def delete_file(cls, filepath: str) -> None:
+        """
+        Удаляет файл/директорию по указанному пути
+        :param filepath: Путь к файлу/директории
+        :return: None
+        """
+        if cls.is_dir(filepath):
+            #TODO стоит ли добавить предупреждение о непустой папке?
+            shutil.rmtree(filepath, ignore_errors=True)
+        else:
+            os.remove(filepath)
 
     @staticmethod
     def rename_file(old_filepath: str, new_filepath: str) -> None:
@@ -157,10 +178,9 @@ class FileManipulator(wx.FileSystem):
 
     @staticmethod
     def calc_checksum(file_path: str) -> str:
-        algorithm = hl.sha1()
+        algorithm = hl.sha1(usedforsecurity=False)
 
         with open(file_path, 'rb') as file:
             algorithm.update(file.read())
 
         return algorithm.hexdigest()
-

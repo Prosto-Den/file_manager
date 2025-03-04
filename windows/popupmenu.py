@@ -12,13 +12,11 @@ class PopUpMenu(wx.PopupTransientWindow):
         super().__init__(parent=parent, flags=flags)
         self.__filepath = filepath
         self.__menu = wx.ListCtrl(parent=self, style=wx.LC_REPORT | wx.LC_NO_HEADER)
-        #self.__menu.GetNextSelected()
         self.__event: wx.ListEvent = event.Clone()
         self.__menu.AppendColumn('', width=100)
         self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, 'Удалить')
         self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, 'Переименовать')
         self.__menu.InsertItem(PopUpItemsID.MOVE_BTN, 'Переместить')
-        #self.__menu.InsertItem(PopUpItemsID.CREATE_BTN, 'Создать')
 
         self.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=self.__perform)
 
@@ -44,7 +42,10 @@ class PopUpMenu(wx.PopupTransientWindow):
                 position = wx.Point(position[0] + ICON_SIZE, position[1])
                 RenameWindow(self.GetParent(), position, self.__filepath + '/' + self.__event.GetText())
             case PopUpItemsID.MOVE_BTN:
-                MoveFileWindow(parent=self.GetParent(), size=MOVE_WINDOW_SIZE)
+                move_file = MoveFileWindow(parent=self.GetParent(), size=MOVE_WINDOW_SIZE)
+                item_id: int = list_ctrl.GetFirstSelected()
+                move_file.set_current_filepath(self.__filepath + list_ctrl.GetItem(item_id).GetText())
+                move_file.Show()
 
         self.destroy()
 

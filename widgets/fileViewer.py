@@ -17,43 +17,96 @@ if TYPE_CHECKING:
 
 
 class FileViewer(wx.ListCtrl):
-    def __init__(self, parent: MainPanel, filepath: str, id: int = wx.ID_ANY,
+    def __init__(self, parent: MainPanel, id: int = wx.ID_ANY,
                  style: int = FILE_VIEWER_STYLE, pos: wx.Point = wx.DefaultPosition,
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr) -> None:
-        wx.ListCtrl.__init__(self, parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
+        super().__init__(parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
 
         self.SetSize(parent.GetSize())
 
-        self.__file_system = FileManipulator(self, filepath)
+        self.__file_system = FileManipulator(self)
+        #TODO возможно стоит перенести FileHistory в ControlPanel
         self.__file_history = wx.FileHistory()
         self.__sort_flag = SortFlags.BY_NAME
 
+        # обновляем наполнение виджета
+        self.update()
+
+        # подключаемся к событиям
         self.Bind(event=EVT_PATH_CHANGED, handler=lambda _: self.update())
         self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__change_sort_flag)
 
-        self.update()
 
     @property
     def file_system(self) -> FileManipulator:
+        """
+        Файловый манипулятор виджета
+        :return: Файловый манипулятор
+        """
         return self.__file_system
 
     @property
     def file_history(self) -> wx.FileHistory:
+
         return self.__file_history
 
+    def update(self) -> None:
+        """
+        Обновляет содержимое обозревателя файлов
+        """
+        # очищаем всё содержимое виджета
+        self.ClearAll()
+
+        # изменяем состояние кнопки возврата для соответствующей панели управления
+        parent: MainPanel = self.GetParent()
+        control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
+        control_panel.enable_back_btn(self.__file_history.GetCount() > 0)
+
+        # отображаем на панели управления правильный путь к директории
+        current_path = self.__file_system.GetPath()
+        control_panel.set_filepath(current_path)
+
+        # создаём колонки для виджета. Если текущее положение не в корневой папке,
+        # то добавляем кнопку подъёма по директории
+        self.__create_columns()
+        if re.match(r'\w:/\b', current_path):
+            self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
+
+        # получаем файлы текущей директории. Сортируем их согласно флагу
+        files = self.__file_system.listdir_with_info()
+        self.__sort(files)
+
+        # заполняем виджет
+        index: int; file: str; size: int; date: dt.datetime
+        for index, (file, size, date) in enumerate(files, start=1):
+            is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
+            icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
+            size_as_bytes = self.__file_system.convert_bytes(size) if not is_directory else ''
+
+            item_index = self.InsertItem(index, file, icon_id)
+            self.SetItem(item_index, 1, str(size_as_bytes))
+            self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
+
     def __create_columns(self) -> None:
+        """
+        Создать колонки для виджета
+        """
         self.AppendColumn('Имя файла')
         self.AppendColumn('Размер файла')
         self.AppendColumn('Дата изменения')
         self.__set_default_column_width()
 
+    #TODO я не помню, зачем он нужен, может уже можно удалить
     def __get_items_from_column(self, column: int) -> list[str]:
         return [self.GetItemText(index, column) for index in range(1, len(self.__file_system.listdir()))]
 
     def __set_default_column_width(self) -> None:
+        """
+        Установить ширину колонок по умолчанию
+        """
         column_amount = self.GetColumnCount()
         column_width = self.GetSize().GetWidth() // column_amount
 
@@ -61,6 +114,10 @@ class FileViewer(wx.ListCtrl):
             self.SetColumnWidth(column, column_width)
 
     def __summon_popup_menu(self, event: wx.ListEvent) -> None:
+        """
+        Вызвать контекстное меня при нажатии ПКМ по элементу списка
+        :param event: Связанное со списком событие
+        """
         if event.GetText() != '..':
             popup = PopUpMenu(self, self.__file_system.GetPath(), event)
             popup.set_position(self.ClientToScreen(event.GetPoint()))
@@ -68,6 +125,9 @@ class FileViewer(wx.ListCtrl):
             popup.Show(True)
 
     def __open(self) -> None:
+        """
+        Открыть файл/перейти в директорию
+        """
         item_label = self.GetItemText(self.GetFirstSelected())
 
         if item_label == '..':
@@ -86,6 +146,11 @@ class FileViewer(wx.ListCtrl):
             self.update()
 
     def __change_sort_flag(self, event: wx.ListEvent) -> None:
+        """
+        Изменить значение флага сортировки
+        :param event: Связанное со списком событие
+        :return:
+        """
         match event.GetColumn():
             case FileViewerColumns.NAME:
                 self.__sort_flag = SortFlags.BY_NAME_DESCENDING if self.__sort_flag == SortFlags.BY_NAME \
@@ -100,6 +165,10 @@ class FileViewer(wx.ListCtrl):
         self.update()
 
     def __sort(self, files: list[tuple[str, int, dt.datetime]]) -> None:
+        """
+        Отсортировать файлы из директории
+        :param files: Файлы директории
+        """
         match self.__sort_flag:
             case SortFlags.BY_NAME:
                 files.sort(key=lambda item: item[0])
@@ -113,34 +182,3 @@ class FileViewer(wx.ListCtrl):
                 files.sort(key=lambda item: item[2])
             case SortFlags.BY_DATE_DESCENDING:
                 files.sort(key=lambda item: item[2], reverse=True)
-
-    def update(self) -> None:
-        self.ClearAll()
-
-        parent: MainPanel = self.GetParent()
-        control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
-
-        if self.__file_history.GetCount() > 0:
-            control_panel.unblock_btn()
-        else:
-            control_panel.block_btn()
-
-        current_path = self.__file_system.GetPath()
-        control_panel.set_filepath(current_path)
-
-        self.__create_columns()
-        if re.match(r'\w:/\b', current_path):
-            self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
-
-        files = self.__file_system.listdir_with_info()
-        self.__sort(files)
-
-        index: int; file: str; size: int; date: dt.datetime
-        for index, (file, size, date) in enumerate(files, start=1):
-            is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
-            icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
-            size_as_bytes = self.__file_system.convert_bytes(size) if not is_directory else ''
-
-            item_index = self.InsertItem(index, file, icon_id)
-            self.SetItem(item_index, 1, str(size_as_bytes))
-            self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))

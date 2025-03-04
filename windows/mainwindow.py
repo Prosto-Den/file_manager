@@ -23,9 +23,11 @@ class MainWindow(wx.Frame):
         self.__toolbar.AddTool(btn)
 
         # создаём панели с виджетами
-        self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE,
-                                      filepath=r'C:/Users/Prosto_Den/Desktop')
+        self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
+
+        self.__left_panel.set_filepath(r'C:/Users/Prosto_Den/Desktop')
+        self.__right_panel.set_filepath(r'C:/')
 
         # настраиваем FileViewer
         file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)

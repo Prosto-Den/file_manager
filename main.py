@@ -19,7 +19,7 @@ IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                                         ICONS_PATH + f'/control_panel/{ICON_SIZE}x{ICON_SIZE}',
                                         ICONS_PATH + f'/toolbar/{ICON_SIZE}x{ICON_SIZE}'],
                            sizes=[ICON_SIZE] * 3,
-                           masks=[False, False, False, False])
+                           masks=[False] * 3)
 
 IconManipulators.init(IconManipulatorID.SYSTEM, ICONS_PATH + '/system', 100, False)
 

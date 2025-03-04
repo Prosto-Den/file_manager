@@ -7,10 +7,11 @@ import wx
 import shutil
 import string
 import datetime as dt
+import pathlib as _pl
 
 
 class FileManipulator(wx.FileSystem):
-    def __init__(self, parent: wx.Window, filepath: str):
+    def __init__(self, parent: wx.Window, filepath: str = None):
         super().__init__()
 
         if filepath is None:
@@ -141,9 +142,11 @@ class FileManipulator(wx.FileSystem):
 
     @staticmethod
     def move_file(old_filepath: str, new_filepath: str) -> None:
-        #TODO проверить
-        #Такая же логика работы у метода rename_file. Может быть, нет смысла в отдельной функции
         shutil.move(old_filepath, new_filepath)
+
+    @staticmethod
+    def copy_file(old_filepath: str, new_filepath: str) -> None:
+        shutil.copy2(old_filepath, new_filepath)
 
     @staticmethod
     def open_file(filepath: str) -> None:
@@ -184,3 +187,7 @@ class FileManipulator(wx.FileSystem):
             algorithm.update(file.read())
 
         return algorithm.hexdigest()
+
+    @classmethod
+    def is_empty(cls, filepath: str) -> bool:
+        return len(os.listdir(filepath)) == 0

@@ -7,9 +7,9 @@ import wx
 import shutil
 import string
 import datetime as dt
-import pathlib as _pl
 
 
+#TODO подумать, может стоить разделить FileManipulator на два класса
 class FileManipulator(wx.FileSystem):
     def __init__(self, parent: wx.Window, filepath: str = None):
         super().__init__()
@@ -82,7 +82,6 @@ class FileManipulator(wx.FileSystem):
         """
         pass
 
-    #TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     def create_folder(self) -> None:
         """
         Создаёт папку в директории, на которую указывает манипулятор
@@ -123,6 +122,7 @@ class FileManipulator(wx.FileSystem):
 
         return result
 
+    # TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     @classmethod
     def delete_file(cls, filepath: str) -> None:
         """

@@ -1,9 +1,11 @@
 import wx
 from settings.enums import PopUpItemsID
 from .renamewindow import RenameWindow
-from .moveFileWindow import MoveFileWindow
+from .moveFileWindow import MoveFileWindow, TreeViewWindow
+from .copyFileWindow import CopyFileWindow
 from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
 from framework.utils import FileManipulator
+from typing import TypeVar
 
 
 class PopUpMenu(wx.PopupTransientWindow):
@@ -11,12 +13,13 @@ class PopUpMenu(wx.PopupTransientWindow):
                  flags: int = wx.BORDER_NONE) -> None:
         super().__init__(parent=parent, flags=flags)
         self.__filepath = filepath
-        self.__menu = wx.ListCtrl(parent=self, style=wx.LC_REPORT | wx.LC_NO_HEADER)
+        self.__menu = wx.ListCtrl(parent=self, style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_HRULES)
         self.__event: wx.ListEvent = event.Clone()
         self.__menu.AppendColumn('', width=100)
         self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, 'Удалить')
         self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, 'Переименовать')
         self.__menu.InsertItem(PopUpItemsID.MOVE_BTN, 'Переместить')
+        self.__menu.InsertItem(PopUpItemsID.COPY_BTN, 'Копировать')
 
         self.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=self.__perform)
 
@@ -33,6 +36,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                     item_filepath = self.__filepath + fr'/{item_text}'
                     FileManipulator.delete_file(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
+
             # переименование файла
             case PopUpItemsID.RENAME_BTN:
                 # получаем положение item на экране
@@ -41,11 +45,20 @@ class PopUpMenu(wx.PopupTransientWindow):
                 # смещаем вправо на размер иконки
                 position = wx.Point(position[0] + ICON_SIZE, position[1])
                 RenameWindow(self.GetParent(), position, self.__filepath + '/' + self.__event.GetText())
+
+            # перемещение файла
             case PopUpItemsID.MOVE_BTN:
                 move_file = MoveFileWindow(parent=self.GetParent(), size=MOVE_WINDOW_SIZE)
                 item_id: int = list_ctrl.GetFirstSelected()
                 move_file.set_current_filepath(self.__filepath + list_ctrl.GetItem(item_id).GetText())
                 move_file.Show()
+
+            # копирование файла
+            case PopUpItemsID.COPY_BTN:
+                copy_file = CopyFileWindow(parent=self.GetParent(), size=MOVE_WINDOW_SIZE)
+                item_id: int = list_ctrl.GetFirstSelected()
+                copy_file.set_current_filepath(self.__filepath + list_ctrl.GetItem(item_id).GetText())
+                copy_file.Show()
 
         self.destroy()
 

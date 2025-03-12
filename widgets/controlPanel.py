@@ -27,6 +27,7 @@ class ControlPanel(wx.Panel):
         self.__choice.Bind(event=wx.EVT_CHOICE, handler=lambda _: self.__change_disk())
         self.__add_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__summon_create_window())
         self.__back_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__back())
+        self.__insert_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__insert_from_clipboard())
 
     @property
     def disk(self) -> str:
@@ -57,6 +58,9 @@ class ControlPanel(wx.Panel):
         :param enable: True - включить кнопку, False - выключить
         """
         self.__back_btn.Enable(enable)
+
+    def enable_insert_btn(self, enable: bool = True) -> None:
+        self.__insert_btn.Enable(enable)
 
     def __create_layout(self) -> None:
         """
@@ -96,6 +100,11 @@ class ControlPanel(wx.Panel):
         # self.__forward_btn.Disable()
         # self.__forward_btn.Fit()
 
+        # кнопка "Вставить"
+        bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.INSERT_ICON))
+        self.__insert_btn = wx.BitmapButton(parent=self, bitmap=bitmap)
+        #self.__insert_btn.Disable()
+
         # строка с текущей файловой директорией
         self.__current_filepath = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
         self.__current_filepath.SetBackgroundColour(WHITE)
@@ -104,6 +113,7 @@ class ControlPanel(wx.Panel):
         btn_sizer = wx.GridBagSizer(5, 5)
         btn_sizer.Add(self.__add_btn, (0, 0), flag=wx.ALIGN_CENTRE)
         btn_sizer.Add(self.__back_btn, (0, 1), flag=wx.ALIGN_CENTRE)
+        btn_sizer.Add(self.__insert_btn, (0, 2), flag=wx.ALIGN_CENTER)
 
         # размещаем виджеты
         sizer.Add(disk_icon, (0, 0), flag=wx.ALIGN_CENTRE)
@@ -149,3 +159,7 @@ class ControlPanel(wx.Panel):
         file_viewer.file_history.RemoveFileFromHistory(0)
         file_viewer.file_system.change_path_to(filepath)
         file_viewer.update()
+
+    def __insert_from_clipboard(self):
+        for file in FileManipulator.get_data_from_clipboard():
+            FileManipulator.copy_file(file, self.current_filepath)

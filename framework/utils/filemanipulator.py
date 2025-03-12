@@ -188,6 +188,28 @@ class FileManipulator(wx.FileSystem):
 
         return algorithm.hexdigest()
 
+    @staticmethod
+    def copy_to_clipboard(filepath: str) -> None:
+        clipboard: wx.Clipboard = wx.Clipboard.Get()
+
+        if clipboard.Open():
+            clipboard.SetData(wx.TextDataObject(filepath))
+            clipboard.Close()
+
+
+    @classmethod
+    def get_data_from_clipboard(cls) -> list[str]:
+        clipboard: wx.Clipboard = wx.Clipboard.Get()
+        data = wx.TextDataObject()
+        files = ''
+
+        if clipboard.Open():
+            clipboard.GetData(data)
+            files = data.GetText()
+            clipboard.Close()
+
+        return files.split(r'\?\\')
+
     @classmethod
     def is_empty(cls, filepath: str) -> bool:
         return len(os.listdir(filepath)) == 0

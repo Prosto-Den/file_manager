@@ -1,10 +1,10 @@
-from typing import override
+from typing import override, LiteralString
 from framework.utils import FileManipulator
 import wx
 
 
 class RenameWindow(wx.PopupTransientWindow):
-    def __init__(self, parent: wx.Window, pos: wx.Point, filepath: str,
+    def __init__(self, parent: wx.Window, pos: wx.Point, filepath: LiteralString | str | bytes,
                  flags: int = wx.PU_CONTAINS_CONTROLS) -> None:
         super().__init__(parent=parent, flags=flags)
         self.__entry = wx.TextCtrl(parent=self, style=wx.TE_PROCESS_ENTER)

@@ -1,6 +1,7 @@
 import wx
 from typing import override
-from .treeViewWindow import TreeViewWindow, FileManipulator
+from framework.baseWindows import TreeViewWindow
+from framework.utils import FileManipulator
 
 
 class MoveFileWindow(TreeViewWindow):

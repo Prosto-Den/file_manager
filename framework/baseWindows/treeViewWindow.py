@@ -2,9 +2,10 @@ import wx
 import os
 from framework.utils import FileManipulator
 from settings.consts import WHITE
-from typing import Any
+from typing import Any, TypeVar
 
 
+#TODO этот класс не кроссплатформенный, работает только на Windows
 class TreeViewWindow(wx.Frame):
     """
     Базовый класс для окон перемещения и копирования. Так как эти окна похожи, то общая логика была вынесена в
@@ -198,3 +199,5 @@ class TreeViewWindow(wx.Frame):
         :param filepath: Путь к файлу
         """
         self.__current_file.SetValue(filepath)
+
+TreeViewType = TypeVar('TreeViewType', bound=TreeViewWindow)

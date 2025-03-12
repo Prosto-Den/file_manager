@@ -1,6 +1,7 @@
 import wx
 from typing import override
-from .treeViewWindow import TreeViewWindow, FileManipulator
+from framework.baseWindows import TreeViewWindow
+from framework.utils import FileManipulator
 
 
 class CopyFileWindow(TreeViewWindow):
@@ -18,7 +19,6 @@ class CopyFileWindow(TreeViewWindow):
     def _perform(self) -> None:
         """
         Скопировать файл в указанную директорию
-        :return:
         """
         FileManipulator.copy_file(self._get_current_file_value(), self._get_entry_value())
         self.Destroy()

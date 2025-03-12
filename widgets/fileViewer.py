@@ -10,6 +10,7 @@ from widgets.controlPanel import ControlPanel
 import datetime as dt
 import wx
 import re
+import os
 
 
 if TYPE_CHECKING:
@@ -39,7 +40,6 @@ class FileViewer(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__change_sort_flag)
 
-
     @property
     def file_system(self) -> FileManipulator:
         """
@@ -50,7 +50,6 @@ class FileViewer(wx.ListCtrl):
 
     @property
     def file_history(self) -> wx.FileHistory:
-
         return self.__file_history
 
     def update(self) -> None:
@@ -82,14 +81,19 @@ class FileViewer(wx.ListCtrl):
         # заполняем виджет
         index: int; file: str; size: int; date: dt.datetime
         for index, (file, size, date) in enumerate(files, start=1):
-            is_directory: bool = self.__file_system.is_dir(self.__file_system.GetPath() + file)
+            # определяем абсолютный путь до файла
+            path = os.path.join(self.__file_system.GetPath(), file)
+            is_directory: bool = self.__file_system.is_dir(path)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
+            # переводим размер файла из байтов в КБ, МБ и прочее
             size_as_bytes = self.__file_system.convert_bytes(size) if not is_directory else ''
 
             item_index = self.InsertItem(index, file, icon_id)
+            # выставляем информацию для колонок
             self.SetItem(item_index, 1, str(size_as_bytes))
             self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
 
+    #TODO создать класс конфигурации, в котором будем хранить положение столбцо
     def __create_columns(self) -> None:
         """
         Создать колонки для виджета
@@ -119,7 +123,8 @@ class FileViewer(wx.ListCtrl):
         :param event: Связанное со списком событие
         """
         if event.GetText() != '..':
-            popup = PopUpMenu(self, self.__file_system.GetPath(), event)
+            popup = PopUpMenu(self, event)
+            popup.set_filepath(self.__file_system.GetPath())
             popup.set_position(self.ClientToScreen(event.GetPoint()))
             popup.set_size(POPUP_MENU_SIZE)
             popup.Show(True)

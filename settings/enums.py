@@ -35,12 +35,14 @@ class ControlPanelIconID(IntEnum):
     BACK_ARROW = auto()
     DISK_ICON = auto()
     FORWARD_ARROW = auto()
+    INSERT_ICON = auto()
 
 
 class PopUpItemsID(IntEnum):
     DELETE_BTN = 0
     RENAME_BTN = auto()
-    MOVE_BTN = auto()
+    MOVE_INTO_BTN = auto()
+    COPY_INTO_BTN = auto()
     COPY_BTN = auto()
 
 

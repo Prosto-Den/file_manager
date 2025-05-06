@@ -1,5 +1,5 @@
 import wx
-from settings.iconManipulators import IconManipulators
+from settings.icon_manipulators import IconManipulators
 from settings.enums import IconManipulatorID, FileViewerIconID, CreateItemsID, FileFormatID
 from framework.events import CreateEvent
 

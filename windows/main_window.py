@@ -1,9 +1,9 @@
-from .findDuplicateWindow import FindDuplicateWindow
+from .find_duplicate_window import FindDuplicateWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE, WIDGET, DUPLICATE_WINDOW_SIZE
-from settings.iconManipulators import IconManipulators
-from widgets.mainPanel import MainPanel
-from widgets.fileViewer import FileViewer
+from settings.icon_manipulators import IconManipulators
+from widgets.main_panel import MainPanel
+from widgets.file_viewer import FileViewer
 import wx
 
 
@@ -26,7 +26,7 @@ class MainWindow(wx.Frame):
         self.__left_panel = MainPanel(parent=self, id=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
-        self.__left_panel.set_filepath(r'C:/Users/Prosto_Den/Desktop')
+        self.__left_panel.set_filepath(r'C:/Users/comp1/Рабочий стол')
         self.__right_panel.set_filepath(r'C:/')
 
         # настраиваем FileViewer

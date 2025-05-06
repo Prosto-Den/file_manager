@@ -1,10 +1,10 @@
 import wx
-from framework.utils import FileManipulator
-from widgets.controlPanel import ControlPanel
-from widgets.fileViewer import FileViewer
+from framework.utils.file_system import FileSystem
+from widgets.control_panel import ControlPanel
+from widgets.file_viewer import FileViewer
 from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent
 from settings.consts import CONTROL_PANEL_SIZE, WIDGET
-from settings.enums import CreateItemsID, WidgetID, FileFormatID
+from settings.enums import CreateItemsID, WidgetID
 
 
 class MainPanel(wx.Panel):
@@ -29,7 +29,7 @@ class MainPanel(wx.Panel):
         return self.__control_panel.current_filepath
 
     @property
-    def file_system(self) -> FileManipulator:
+    def file_system(self) -> FileSystem:
         return self.__file_viewer.file_system
 
     def __create_layout(self) -> None:

@@ -1,15 +1,15 @@
-import wx
-import os
-from framework.utils import FileManipulator
+from framework.utils.file_system import FileSystem
+from framework.utils.file_utils import FileUtils
 from settings.consts import WHITE
 from typing import Any, TypeVar
+import wx
+import os
 
 
 #TODO этот класс не кроссплатформенный, работает только на Windows
 class TreeViewWindow(wx.Frame):
     """
-    Базовый класс для окон перемещения и копирования. Так как эти окна похожи, то общая логика была вынесена в
-    отдельный класс. \n
+    Базовый класс для окон перемещения и копирования. \n
     Класс содержит метод _perform без тела. Предполагается, что логика для метода прописывается в дочернем классе.
     Если же метод не будет определён, при его вызове будет выкинуто исключение NotImplementedError
     """
@@ -56,13 +56,13 @@ class TreeViewWindow(wx.Frame):
 
         # наполняем tree view коренными узлами
         root = self.__tree_view.AddRoot('System')
-        drives: list[str] = FileManipulator.get_logical_drives()
+        drives: list[str] = FileSystem.get_logical_drives()
         for drive in drives:
             disk = self.__tree_view.AppendItem(root, drive, data=drive)
             files = os.listdir(self.__tree_view.GetItemText(disk))
             for file in files:
                 path = os.path.join(drive, file)
-                if FileManipulator.is_dir(path):
+                if FileUtils.is_dir(path):
                     self.__tree_view.AppendItem(parent=disk, text=file, data=path)
 
         # создаём sizer для кнопок
@@ -118,7 +118,7 @@ class TreeViewWindow(wx.Frame):
                 files: list[str] = os.listdir(child_data)
                 for file in files:
                     path = os.path.join(child_data, file)
-                    if FileManipulator.is_dir(os.path.join(path)):
+                    if FileUtils.is_dir(os.path.join(path)):
                         self.__tree_view.AppendItem(parent=child, text=file, data=path)
 
             #TODO заменить pass на запись в логи

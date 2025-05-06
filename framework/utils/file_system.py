@@ -1,24 +1,23 @@
-from framework.events import PathChangedEvent
-from .timeFunc import ns_to_datetime
-import os
-import hashlib as hl
-import re
-import wx
-import shutil
-import string
+from framework.utils.file_utils import FileUtils
+from framework.events.events import PathChangedEvent
+from framework.utils.time_utils import TimeUtils
 import datetime as dt
+import string
+import wx
+import os
+import re
 
 
-#TODO подумать, может стоить разделить FileManipulator на два класса
-class FileManipulator(wx.FileSystem):
-    def __init__(self, parent: wx.Window, filepath: str = None):
+class FileSystem(wx.FileSystem):
+    def __init__(self, parent: wx.Window, filepath: str) -> None:
         super().__init__()
 
-        if filepath is None:
-            filepath = os.path.dirname(__file__)
+        filepath = os.path.dirname(filepath)
+
         self.ChangePathTo(filepath, True)
 
-        self.__event_handler: wx.EvtHandler = parent.GetEventHandler()
+        #TODO возможно стоит сделать класс связку
+        self.__event_handler = parent.EventHandler
 
         # наблюдатель нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
         # на изменение директории не реагирует
@@ -59,9 +58,10 @@ class FileManipulator(wx.FileSystem):
         """
         files = self.listdir(is_absolute)
         absolute_file_path = self.listdir(True)
-        file_info = [self.get_file_info(file) for file in absolute_file_path]
-        sizes = [info.st_size if self.is_file(file) else 0 for file, info in zip(absolute_file_path, file_info)]
-        dates = [ns_to_datetime(info.st_ctime_ns) for info in file_info]
+        file_info = [FileUtils.get_file_info(file) for file in absolute_file_path]
+        sizes = [info.st_size if FileUtils.is_file(file)
+                              else 0 for file, info in zip(absolute_file_path, file_info)]
+        dates = [TimeUtils.ns_to_datetime(info.st_ctime_ns) for info in file_info]
 
         return list(zip(files, sizes, dates))
 
@@ -122,71 +122,9 @@ class FileManipulator(wx.FileSystem):
 
         return result
 
-    # TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
-    @classmethod
-    def delete_file(cls, filepath: str) -> None:
-        """
-        Удаляет файл/директорию по указанному пути
-        :param filepath: Путь к файлу/директории
-        :return: None
-        """
-        if cls.is_dir(filepath):
-            #TODO стоит ли добавить предупреждение о непустой папке?
-            shutil.rmtree(filepath, ignore_errors=True)
-        else:
-            os.remove(filepath)
-
-    @staticmethod
-    def rename_file(old_filepath: str, new_filepath: str) -> None:
-        os.rename(old_filepath, new_filepath)
-
-    @staticmethod
-    def move_file(old_filepath: str, new_filepath: str) -> None:
-        shutil.move(old_filepath, new_filepath)
-
-    @staticmethod
-    def copy_file(old_filepath: str, new_filepath: str) -> None:
-        shutil.copy2(old_filepath, new_filepath)
-
-    @staticmethod
-    def open_file(filepath: str) -> None:
-        os.startfile(filepath)
-
-    @staticmethod
-    def is_dir(filepath: str) -> bool:
-        return os.path.isdir(filepath)
-
-    @staticmethod
-    def is_file(filepath: str) -> bool:
-        return os.path.isfile(filepath)
-
     @staticmethod
     def get_logical_drives() -> list[str]:
         return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
-
-    @staticmethod
-    def get_file_info(filepath: str) -> os.stat_result:
-        return os.stat(filepath)
-
-    @staticmethod
-    def convert_bytes(size: float) -> str:
-        counter = 0
-        INFO_SIZES = ('B', 'KB', 'MB', 'GB', 'TB', 'PB')
-
-        while size >= 1024 and counter < len(INFO_SIZES) - 1:
-            size /= 1024
-            counter += 1
-
-        return f"{size:.2f} {INFO_SIZES[counter]}"
-
-    @staticmethod
-    def calc_checksum(file_path: str) -> str:
-        algorithm = hl.sha1(usedforsecurity=False)
-
-        with open(file_path, 'rb') as file:
-            algorithm.update(file.read())
-
-        return algorithm.hexdigest()
 
     @staticmethod
     def copy_to_clipboard(filepath: str) -> None:
@@ -196,9 +134,8 @@ class FileManipulator(wx.FileSystem):
             clipboard.SetData(wx.TextDataObject(filepath))
             clipboard.Close()
 
-
-    @classmethod
-    def get_data_from_clipboard(cls) -> list[str]:
+    @staticmethod
+    def get_data_from_clipboard() -> list[str]:
         clipboard: wx.Clipboard = wx.Clipboard.Get()
         data = wx.TextDataObject()
         files = ''
@@ -209,7 +146,3 @@ class FileManipulator(wx.FileSystem):
             clipboard.Close()
 
         return files.split(r'\?\\')
-
-    @classmethod
-    def is_empty(cls, filepath: str) -> bool:
-        return len(os.listdir(filepath)) == 0

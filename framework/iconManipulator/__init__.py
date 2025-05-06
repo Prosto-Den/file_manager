@@ -1,1 +1,0 @@
-from .iconManipulator import IconManipulator

@@ -1,7 +1,7 @@
-from windows.mainwindow import MainWindow
+from windows.main_window import MainWindow
 from settings.enums import WindowID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_SIZE, ICON_SIZE, ICONS_PATH
-from settings.iconManipulators import IconManipulators
+from settings.icon_manipulators import IconManipulators
 from warnings import simplefilter
 import wx
 

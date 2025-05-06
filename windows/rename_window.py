@@ -1,5 +1,5 @@
 from typing import override, LiteralString
-from framework.utils import FileManipulator
+from framework.utils import FileUtils
 import wx
 
 
@@ -14,7 +14,7 @@ class RenameWindow(wx.PopupTransientWindow):
         x, _ = self.__entry.GetTextExtent(text)
         self.__entry.SetSize(wx.Size(x + 20, -1))
 
-        if FileManipulator.is_file(filepath):
+        if FileUtils.is_file(filepath):
             for i in range(len(text) - 1, 0, -1):
                 if text[i] == '.':
                     self.__entry.SetSelection(0, i)
@@ -39,4 +39,4 @@ class RenameWindow(wx.PopupTransientWindow):
                 return
 
             new_filepath = '/'.join(new_filepath) + '/' + new_file_name
-            FileManipulator.rename_file(self.__filepath, new_filepath)
+            FileUtils.rename_file(self.__filepath, new_filepath)

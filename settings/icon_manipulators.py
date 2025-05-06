@@ -1,4 +1,4 @@
-from framework.iconManipulator import IconManipulator as _IconManipulator
+from framework.icon_manipulator import IconManipulator as _IconManipulator
 from warnings import warn
 from typing import Sequence
 

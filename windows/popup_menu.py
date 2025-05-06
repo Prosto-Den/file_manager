@@ -1,12 +1,12 @@
 import wx
 import os
 from settings.enums import PopUpItemsID
-from .renamewindow import RenameWindow
-from .moveFileWindow import MoveFileWindow
-from .copyFileWindow import CopyFileWindow
+from .rename_window import RenameWindow
+from .move_file_window import MoveFileWindow
+from .copy_file_window import CopyFileWindow
 from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
-from framework.utils import FileManipulator
-from framework.baseWindows import TreeViewType
+from framework.utils import FileUtils
+from framework.base_windows import TreeViewType
 
 
 class PopUpMenu(wx.PopupTransientWindow):
@@ -42,7 +42,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                 while item_id != -1:
                     item_text: str = list_ctrl.GetItem(item_id).GetText()
                     item_filepath = os.path.join(self.__filepath, item_text)
-                    FileManipulator.delete_file(item_filepath)
+                    FileUtils.delete_file(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 
             # переименование файла
@@ -74,7 +74,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                     files.append(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 
-                FileManipulator.copy_to_clipboard(r'\?\\'.join(files))
+                FileUtils.copy_to_clipboard(r'\?\\'.join(files))
 
         self.Destroy()
 

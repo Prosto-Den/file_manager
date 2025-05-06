@@ -1,7 +1,7 @@
 import wx
 from typing import override
-from framework.baseWindows import TreeViewWindow
-from framework.utils import FileManipulator
+from framework.base_windows import TreeViewWindow
+from framework.utils import FileUtils
 
 
 class MoveFileWindow(TreeViewWindow):
@@ -20,5 +20,5 @@ class MoveFileWindow(TreeViewWindow):
         """
         Переместить файл в указанную директорию
         """
-        FileManipulator.move_file(self._get_current_file_value(), self._get_entry_value())
+        FileUtils.move_file(self._get_current_file_value(), self._get_entry_value())
         self.Destroy()

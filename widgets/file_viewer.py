@@ -1,12 +1,13 @@
 from __future__ import annotations
 from typing import TYPE_CHECKING
 from settings.consts import FILE_VIEWER_STYLE
-from windows.popupmenu import PopUpMenu
-from framework.utils import FileManipulator
+from windows.popup_menu import PopUpMenu
+from framework.utils import FileUtils
+from framework.utils.file_system import FileSystem
 from framework.events import EVT_PATH_CHANGED
 from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
 from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, WidgetID
-from widgets.controlPanel import ControlPanel
+from widgets.control_panel import ControlPanel
 import datetime as dt
 import wx
 import re
@@ -14,7 +15,7 @@ import os
 
 
 if TYPE_CHECKING:
-    from widgets.mainPanel import MainPanel
+    from widgets.main_panel import MainPanel
 
 
 class FileViewer(wx.ListCtrl):
@@ -25,7 +26,7 @@ class FileViewer(wx.ListCtrl):
 
         self.SetSize(parent.GetSize())
 
-        self.__file_system = FileManipulator(self)
+        self.__file_system = FileSystem(self, __file__)
         #TODO возможно стоит перенести FileHistory в ControlPanel
         self.__file_history = wx.FileHistory()
         self.__sort_flag = SortFlags.BY_NAME
@@ -41,7 +42,7 @@ class FileViewer(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__change_sort_flag)
 
     @property
-    def file_system(self) -> FileManipulator:
+    def file_system(self) -> FileSystem:
         """
         Файловый манипулятор виджета
         :return: Файловый манипулятор
@@ -83,10 +84,10 @@ class FileViewer(wx.ListCtrl):
         for index, (file, size, date) in enumerate(files, start=1):
             # определяем абсолютный путь до файла
             path = os.path.join(self.__file_system.GetPath(), file)
-            is_directory: bool = self.__file_system.is_dir(path)
+            is_directory: bool = FileUtils.is_dir(path)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
             # переводим размер файла из байтов в КБ, МБ и прочее
-            size_as_bytes = self.__file_system.convert_bytes(size) if not is_directory else ''
+            size_as_bytes = FileUtils.convert_bytes(size) if not is_directory else ''
 
             item_index = self.InsertItem(index, file, icon_id)
             # выставляем информацию для колонок
@@ -143,8 +144,8 @@ class FileViewer(wx.ListCtrl):
         else:
             filename: str = self.__file_system.GetPath() +  item_label
 
-        if not self.__file_system.is_dir(filename):
-            self.__file_system.open_file(filename)
+        if not FileUtils.is_dir(filename):
+            FileUtils.open_file(filename)
         else:
             self.__file_history.AddFileToHistory(self.__file_system.GetPath())
             self.__file_system.change_path_to(filename)

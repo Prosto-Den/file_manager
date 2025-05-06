@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING
 import wx
 
 if TYPE_CHECKING:
-    from windows.mainwindow import MainWindow
+    from windows.main_window import MainWindow
 
 
 class FindDuplicateWindow(wx.Frame):

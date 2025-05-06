@@ -1,5 +1,5 @@
 import wx
-from windows.mainwindow import MainWindow
+from windows.main_window import MainWindow
 
 
 # Пока что не работает

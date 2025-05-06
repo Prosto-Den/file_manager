@@ -1,4 +1,5 @@
 from enum import IntEnum, StrEnum, auto
+from wx import Colour as _Colour
 
 
 class ToolID(IntEnum):
@@ -77,3 +78,7 @@ class SortFlags(IntEnum):
 class FileFormatID(StrEnum):
     TXT = '.txt'
     DOCX = '.docx'
+
+
+class Colours:
+    WHITE = _Colour(255, 255, 255)

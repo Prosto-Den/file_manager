@@ -1,18 +1,19 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
 from settings.enums import ControlPanelIconID, WindowID, WidgetID, IconManipulatorID
-from settings.consts import WHITE
-from settings.iconManipulators  import IconManipulators
-from framework.utils import FileManipulator
+from settings.icon_manipulators  import IconManipulators
+from framework.utils.file_system import FileSystem
+from framework.utils.file_utils import FileUtils
 from framework.events import DiskChangedEvent
-from windows.createWindow import CreateWindow
+from windows.create_window import CreateWindow
+from settings.enums import Colours
+from typing import TYPE_CHECKING
 import wx
 
 
 # для возможной работы аннотации типов
 if TYPE_CHECKING:
-    from widgets.mainPanel import MainPanel
-    from widgets.fileViewer import FileViewer
+    from widgets.main_panel import MainPanel
+    from widgets.file_viewer import FileViewer
 
 
 class ControlPanel(wx.Panel):
@@ -66,7 +67,7 @@ class ControlPanel(wx.Panel):
         """
         Создать виджеты на панели
         """
-        self.SetBackgroundColour(WHITE)
+        self.SetBackgroundColour(Colours.WHITE)
         sizer = wx.GridBagSizer(hgap=5)
 
         # настраиваем иконки
@@ -79,7 +80,7 @@ class ControlPanel(wx.Panel):
         disk_icon = wx.StaticBitmap(parent=self, bitmap=bitmap)
 
         # выпадающий список из имеющихся на Пк дисков
-        self.__choice = wx.Choice(parent=self, choices=FileManipulator.get_logical_drives())
+        self.__choice = wx.Choice(parent=self, choices=FileSystem.get_logical_drives())
         self.__choice.SetSelection(0)
         self.__choice_value: str = self.__choice.GetStringSelection()
 
@@ -107,7 +108,7 @@ class ControlPanel(wx.Panel):
 
         # строка с текущей файловой директорией
         self.__current_filepath = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
-        self.__current_filepath.SetBackgroundColour(WHITE)
+        self.__current_filepath.SetBackgroundColour(Colours.WHITE)
 
         # создаём sizer для кнопок
         btn_sizer = wx.GridBagSizer(5, 5)
@@ -161,5 +162,5 @@ class ControlPanel(wx.Panel):
         file_viewer.update()
 
     def __insert_from_clipboard(self):
-        for file in FileManipulator.get_data_from_clipboard():
-            FileManipulator.copy_file(file, self.current_filepath)
+        for file in FileSystem.get_data_from_clipboard():
+            FileUtils.copy_file(file, self.current_filepath)

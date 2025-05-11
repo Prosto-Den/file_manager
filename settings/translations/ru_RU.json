@@ -1,0 +1,21 @@
+{
+  "create": "Создать",
+  "back": "...",
+  "copyWindowTitle": "Копировать файл",
+  "copyInto": "Копировать в: ",
+  "copy": "Копировать",
+  "createDirectory": "Папку",
+  "createTextFile": "Текстовый файл",
+  "createWordFile": "Документ Microsoft Word",
+  "findDuplicateWindowTitle": "Поиск дубликатов",
+  "moveWindowTitle": "Переместить файл",
+  "moveInto": "Переместить в",
+  "move": "Переместить",
+  "delete": "Удалить",
+  "rename": "Переименовать",
+  "compareDirectories": "Сравнить две директории",
+  "oneDirectory": "Найти дубликаты в директории",
+  "firstDirectory": "Первая директория:",
+  "secondDirectory": "Вторая директория:",
+  "directory": "Директория"
+}

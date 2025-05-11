@@ -1,4 +1,4 @@
-from .find_duplicate_window import FindDuplicateWindow
+from windows.find_duplicate_window import FindDuplicateWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE, WIDGET, DUPLICATE_WINDOW_SIZE
 from settings.icon_manipulators import IconManipulators

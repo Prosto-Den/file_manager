@@ -2,6 +2,9 @@ from enum import IntEnum, StrEnum, auto
 from wx import Colour as _Colour
 
 
+"""ID виджетов уникален в рамках родителя, а не всего приложения"""
+
+
 class ToolID(IntEnum):
     FIND_DUPLICATES = 0
 
@@ -78,6 +81,18 @@ class SortFlags(IntEnum):
 class FileFormatID(StrEnum):
     TXT = '.txt'
     DOCX = '.docx'
+
+
+class FindDuplicateWindowWidgetsID(IntEnum):
+    ONE_DIR_RADIO_BTN = 0
+    TWO_DIR_RADIO_BTN = auto()
+    FIRST_DIR_LABEL = auto()
+    SECOND_DIR_LABEL = auto()
+    FIRST_DIR_INPUT = auto()
+    SECOND_DIR_INPUT = auto()
+    SET_FIRST_DIR_BTN = auto()
+    SET_SECOND_DIR_BTN = auto()
+    DIRECTORIES_PANEL = auto()
 
 
 class Colours:

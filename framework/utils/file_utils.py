@@ -1,7 +1,8 @@
+from typing import LiteralString
 import hashlib as hl
 import shutil
 import os
-import wx
+
 
 
 
@@ -22,7 +23,7 @@ class FileUtils:
 
     #TODO сделать через move?
     @staticmethod
-    def rename_file(old_filepath: str, new_filepath: str) -> None:
+    def rename_file(old_filepath: str | bytes | LiteralString, new_filepath: str | bytes | LiteralString) -> None:
         os.rename(old_filepath, new_filepath)
 
     @staticmethod
@@ -42,7 +43,7 @@ class FileUtils:
         return os.path.isdir(filepath)
 
     @staticmethod
-    def is_file(filepath: str) -> bool:
+    def is_file(filepath: str | bytes | LiteralString) -> bool:
         return os.path.isfile(filepath)
 
     @staticmethod

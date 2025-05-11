@@ -17,7 +17,7 @@ PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeigh
 CONTROL_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, 60)
 FILE_VIEWER_SIZE = wx.Size(PANEL_SIZE.GetWidth(), PANEL_SIZE.GetHeight() - 110)
 POPUP_MENU_SIZE = wx.Size(100, 200)
-DUPLICATE_WINDOW_SIZE = wx.Size(400, 200)
+DUPLICATE_WINDOW_SIZE = wx.Size(600, 200)
 MOVE_WINDOW_SIZE = wx.Size(450, 500)
 
 # styles
@@ -31,3 +31,4 @@ WHITE = wx.Colour(255, 255, 255)
 
 # нужен, чтобы IDE не ругалась на несоответствие типов
 WIDGET = TypeVar('WIDGET', bound=wx.Window)
+CURRENT_LANGUAGE = "ru_RU"

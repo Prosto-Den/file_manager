@@ -24,6 +24,8 @@ class ControlPanel(wx.Panel):
         # создаём layout панели
         self.__create_layout()
 
+        self.__file_history = wx.FileHistory()
+
         # реакция на события
         self.__choice.Bind(event=wx.EVT_CHOICE, handler=lambda _: self.__change_disk())
         self.__add_btn.Bind(event=wx.EVT_BUTTON, handler=lambda _: self.__summon_create_window())
@@ -53,12 +55,14 @@ class ControlPanel(wx.Panel):
         """
         self.__current_filepath.SetValue(filepath)
 
-    def enable_back_btn(self, enable: bool = True) -> None:
+    def check_back_btn_enable(self) -> None:
         """
         Метод для отключения/включения кнопки "Назад"
-        :param enable: True - включить кнопку, False - выключить
         """
-        self.__back_btn.Enable(enable)
+        self.__back_btn.Enable(self.__file_history.GetCount() > 0)
+
+    def add_file_to_history(self, filepath: str) -> None:
+        self.__file_history.AddFileToHistory(filepath)
 
     def enable_insert_btn(self, enable: bool = True) -> None:
         self.__insert_btn.Enable(enable)
@@ -156,8 +160,8 @@ class ControlPanel(wx.Panel):
         """
         parent: MainPanel = self.GetParent()
         file_viewer: FileViewer = parent.get_widget(WidgetID.FILE_VIEWER)
-        filepath: str = file_viewer.file_history.GetHistoryFile(0)
-        file_viewer.file_history.RemoveFileFromHistory(0)
+        filepath: str = self.__file_history.GetHistoryFile(0)
+        self.__file_history.RemoveFileFromHistory(0)
         file_viewer.file_system.change_path_to(filepath)
         file_viewer.update()
 

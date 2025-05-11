@@ -1,5 +1,5 @@
 from framework.icon_manipulator import IconManipulator as _IconManipulator
-from warnings import warn
+from framework.utils.path_helper import PathHelper
 from typing import Sequence
 
 
@@ -16,7 +16,6 @@ class IconManipulators:
         :param mask: Использовать ли маску для иконок
         """
         if manipulator_id in cls.__icon_manipulators.keys():
-            warn('Манипулятор с таким id уже существует, перезапись не производится')
             return
         cls.__icon_manipulators[manipulator_id] = _IconManipulator(icons_path=icons_path, size=size, mask=mask)
 

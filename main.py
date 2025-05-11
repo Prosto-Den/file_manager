@@ -2,22 +2,20 @@ from windows.main_window import MainWindow
 from settings.enums import WindowID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_SIZE, ICON_SIZE, ICONS_PATH
 from settings.icon_manipulators import IconManipulators
-from warnings import simplefilter
+from framework.utils.path_helper import PathHelper
 import wx
 
 
 # приложение
 app = wx.App()
-# настраиваем фильтр, чтобы warning всегда выходили
-simplefilter(action='always')
 
 # подключаем иконки
 IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                                             IconManipulatorID.CONTROL_PANEL,
                                             IconManipulatorID.TOOLBAR],
-                           icons_paths=[ICONS_PATH + f'/file_viewer/{ICON_SIZE}x{ICON_SIZE}',
-                                        ICONS_PATH + f'/control_panel/{ICON_SIZE}x{ICON_SIZE}',
-                                        ICONS_PATH + f'/toolbar/{ICON_SIZE}x{ICON_SIZE}'],
+                           icons_paths=[PathHelper.icons_path() + f'/file_viewer/{ICON_SIZE}x{ICON_SIZE}',
+                                        PathHelper.icons_path() + f'/control_panel/{ICON_SIZE}x{ICON_SIZE}',
+                                        PathHelper.icons_path() + f'/toolbar/{ICON_SIZE}x{ICON_SIZE}'],
                            sizes=[ICON_SIZE] * 3,
                            masks=[False] * 3)
 

@@ -27,8 +27,6 @@ class FileViewer(wx.ListCtrl):
         self.SetSize(parent.GetSize())
 
         self.__file_system = FileSystem(self, __file__)
-        #TODO возможно стоит перенести FileHistory в ControlPanel
-        self.__file_history = wx.FileHistory()
         self.__sort_flag = SortFlags.BY_NAME
 
         # обновляем наполнение виджета
@@ -49,21 +47,18 @@ class FileViewer(wx.ListCtrl):
         """
         return self.__file_system
 
-    @property
-    def file_history(self) -> wx.FileHistory:
-        return self.__file_history
-
     def update(self) -> None:
         """
         Обновляет содержимое обозревателя файлов
         """
+        self.Freeze()
         # очищаем всё содержимое виджета
         self.ClearAll()
 
         # изменяем состояние кнопки возврата для соответствующей панели управления
         parent: MainPanel = self.GetParent()
         control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
-        control_panel.enable_back_btn(self.__file_history.GetCount() > 0)
+        control_panel.check_back_btn_enable()
 
         # отображаем на панели управления правильный путь к директории
         current_path = self.__file_system.GetPath()
@@ -93,6 +88,8 @@ class FileViewer(wx.ListCtrl):
             # выставляем информацию для колонок
             self.SetItem(item_index, 1, str(size_as_bytes))
             self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
+        # размораживаем виджет
+        self.Thaw()
 
     #TODO создать класс конфигурации, в котором будем хранить положение столбцо
     def __create_columns(self) -> None:
@@ -147,7 +144,9 @@ class FileViewer(wx.ListCtrl):
         if not FileUtils.is_dir(filename):
             FileUtils.open_file(filename)
         else:
-            self.__file_history.AddFileToHistory(self.__file_system.GetPath())
+            parent: MainPanel = self.GetParent()
+            control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
+            control_panel.add_file_to_history(self.__file_system.GetPath())
             self.__file_system.change_path_to(filename)
             self.update()
 

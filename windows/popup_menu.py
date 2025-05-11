@@ -1,11 +1,12 @@
 import wx
 import os
 from settings.enums import PopUpItemsID
-from .rename_window import RenameWindow
-from .move_file_window import MoveFileWindow
-from .copy_file_window import CopyFileWindow
+from windows.rename_window import RenameWindow
+from windows.move_file_window import MoveFileWindow
+from windows.copy_file_window import CopyFileWindow
 from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
-from framework.utils import FileUtils
+from framework.utils.file_system import FileSystem
+from framework.utils.file_utils import FileUtils
 from framework.base_windows import TreeViewType
 
 
@@ -74,7 +75,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                     files.append(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 
-                FileUtils.copy_to_clipboard(r'\?\\'.join(files))
+                FileSystem.copy_to_clipboard(r'\?\\'.join(files))
 
         self.Destroy()
 

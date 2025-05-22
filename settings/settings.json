@@ -1,0 +1,12 @@
+{
+  "programTitle": "Prosto File Manager",
+  "timeFormat": "%d.%m.%Y %H:%M",
+  "iconSize": 24,
+  "mainWindowSize": [1095, 900],
+  "panelSize": [547, 450],
+  "controlPanelSize": [547, 60],
+  "fileViewerSize": [547, 340],
+  "popupMenuSize": [100, 200],
+  "duplicateWindowSize": [100, 200],
+  "moveWindowSize": [450, 500]
+}

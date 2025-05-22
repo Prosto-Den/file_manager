@@ -1,6 +1,6 @@
 from windows.main_window import MainWindow
 from settings.enums import WindowID, IconManipulatorID
-from settings.consts import MAIN_WINDOW_SIZE, ICON_SIZE, ICONS_PATH
+from settings.consts import MAIN_WINDOW_SIZE, ICON_SIZE
 from settings.icon_manipulators import IconManipulators
 from framework.utils.path_helper import PathHelper
 import wx
@@ -19,7 +19,7 @@ IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                            sizes=[ICON_SIZE] * 3,
                            masks=[False] * 3)
 
-IconManipulators.init(IconManipulatorID.SYSTEM, ICONS_PATH + '/system', 100, False)
+IconManipulators.init(IconManipulatorID.SYSTEM, PathHelper.icons_path() + '/system', 100, False)
 
 # окно приложения
 frame = MainWindow(id=WindowID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto File Manager')
@@ -27,6 +27,10 @@ frame = MainWindow(id=WindowID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto
 # показываем окно и запускаем основной цикл приложения
 frame.show()
 app.MainLoop()
+
+#TODO потом вынести в класс app
+clipboard = wx.Clipboard.Get()
+clipboard.Flush()
 
 # if __name__ == '__main__':
 #     app = App()

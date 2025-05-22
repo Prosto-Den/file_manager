@@ -1,36 +1,47 @@
 import wx
-from framework.utils.file_system import FileSystem
 from widgets.control_panel import ControlPanel
 from widgets.file_viewer import FileViewer
-from framework.events import EVT_DISK_CHANGED, DiskChangedEvent, EVT_CREATE, CreateEvent
-from settings.consts import CONTROL_PANEL_SIZE, WIDGET
+from framework.events import EVT_CREATE, CreateEvent, EVT_PATH_CHANGED, PathChanged, EVT_ADD_FILE_TO_HISTORY, \
+    AddFileToHistoryEvent
+from settings.consts import CONTROL_PANEL_SIZE
 from settings.enums import CreateItemsID, WidgetID
+from typing import override
 
 
 class MainPanel(wx.Panel):
-    def __init__(self, parent: wx.Window, id: int = wx.ID_ANY, pos: wx.Point = wx.DefaultPosition,
+    def __init__(self, parent: wx.Window, id_: int = wx.ID_ANY, pos: wx.Point = wx.DefaultPosition,
                  size: wx.Size = wx.DefaultSize, style: int = wx.TAB_TRAVERSAL, name: str = wx.PanelNameStr) -> None:
-        super().__init__(parent=parent, id=id, pos=pos, size=size, style=style, name=name)
+        super().__init__(parent=parent, id=id_, pos=pos, size=size, style=style, name=name)
 
         self.__create_layout()
 
-        self.Bind(event=EVT_DISK_CHANGED, handler=self.__change_file_viewer_disk)
+        # подписываем ControlPanel на обновления FileViewer
+        self.__file_viewer.attach(self.__control_panel)
+
+        self.Bind(event=EVT_PATH_CHANGED, handler=self.__change_file_viewer_path)
+        self.Bind(event=EVT_ADD_FILE_TO_HISTORY, handler=self.__add_file_to_history)
         self.Bind(event=EVT_CREATE, handler=self.__create)
 
-    def get_widget(self, widget_id: int) -> WIDGET:
-        return self.FindWindowById(widget_id, self)
+    @property
+    def file_viewer(self) -> FileViewer:
+        return self.__file_viewer
+
+    @property
+    def control_panel(self) -> ControlPanel:
+        return self.__control_panel
+
+    @override
+    def Destroy(self) -> bool:
+        self.__file_viewer.detach(self.__control_panel)
+        return super().Destroy()
+
 
     def set_filepath(self, filepath: str) -> None:
         self.__control_panel.set_filepath(filepath)
         self.__file_viewer.file_system.change_path_to(filepath)
 
-    @property
-    def current_filepath(self) -> str:
+    def get_filepath(self) -> str:
         return self.__control_panel.current_filepath
-
-    @property
-    def file_system(self) -> FileSystem:
-        return self.__file_viewer.file_system
 
     def __create_layout(self) -> None:
         # настройка sizer'а
@@ -47,8 +58,11 @@ class MainPanel(wx.Panel):
         self.SetSizer(sizer)
         self.Layout()
 
-    def __change_file_viewer_disk(self, event: DiskChangedEvent) -> None:
-        self.__file_viewer.file_system.change_path_to(event.disk)
+    def __change_file_viewer_path(self, event: PathChanged) -> None:
+        self.__file_viewer.file_system.change_path_to(event.location)
+
+    def __add_file_to_history(self, event: AddFileToHistoryEvent) -> None:
+        self.__control_panel.add_file_to_history(event.filepath)
 
     def __create(self, event: CreateEvent) -> None:
         if event.type == CreateItemsID.FOLDER:

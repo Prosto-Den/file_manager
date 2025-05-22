@@ -4,9 +4,11 @@ from wx import Colour as _Colour
 
 """ID виджетов уникален в рамках родителя, а не всего приложения"""
 
+#TODO скорее всего все enums с id виджетов не нужны
 
 class ToolID(IntEnum):
     FIND_DUPLICATES = 0
+    SETTINGS_ID = auto()
 
 
 class WindowID(IntEnum):

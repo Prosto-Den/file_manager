@@ -1,0 +1,21 @@
+{
+  "create": "Create",
+  "back": "...",
+  "copyWindowTitle": "Copy file",
+  "copyInto": "Copy in:",
+  "copy": "Copy",
+  "createDirectory": "Directory",
+  "createTextFile": "Text file",
+  "createWordFile": "Microsoft Word document",
+  "duplicateWindowTitle": "Find duplicates",
+  "moveWindowTitle": "Move file",
+  "moveInto": "Move in: ",
+  "move": "Move",
+  "delete": "Delete",
+  "rename": "Rename",
+  "compareDirectories": "Compare two directories",
+  "oneDirectory": "Find duplicates in directory",
+  "firstDirectory": "First directory: ",
+  "secondDirectory": "Second directory: ",
+  "directory": "Directory"
+}

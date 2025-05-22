@@ -1,4 +1,4 @@
-from framework.icon_manipulator import IconManipulator as _IconManipulator
+from framework.utils.icon_manipulator import IconManipulator as _IconManipulator
 from framework.utils.path_helper import PathHelper
 from typing import Sequence
 
@@ -9,7 +9,7 @@ class IconManipulators:
     @classmethod
     def init(cls, manipulator_id: int, icons_path: str, size: int, mask: bool) -> None:
         """
-        Инициализирует один манипулятор, если манипулятор с таким id ещё не был инициализирован
+        Инициализирует один манипулятор, если манипулятор с таким id_ ещё не был инициализирован
         :param manipulator_id: Id манипулятора
         :param icons_path: Путь к иконкам, которыми будет владеть манипулятор
         :param size: Размер иконки (иконки квадратные)

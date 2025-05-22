@@ -13,6 +13,16 @@ class TreeViewWindow(wx.Frame):
     Класс содержит метод _perform без тела. Предполагается, что логика для метода прописывается в дочернем классе.
     Если же метод не будет определён, при его вызове будет выкинуто исключение NotImplementedError
     """
+    def set_current_filepath(self, filepath: str) -> None:
+        """
+        Выставляет путь к выбранному для перемещения файлу
+        :param filepath: Путь к файлу
+        """
+        self.__current_file.SetValue(filepath)
+
+    def get_entered_value(self) -> str:
+        return self.__entry.GetValue()
+
     def _init(self) -> None:
         """
         Инициализация базовых элементов интерфейса
@@ -45,6 +55,7 @@ class TreeViewWindow(wx.Frame):
         sizer = wx.GridBagSizer(5, 5)
 
         # создаём виджеты
+        self.__current_file_label = wx.StaticText(self, label='Файл: ')
         self.__current_file = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
         self.__current_file.SetBackgroundColour(WHITE)
         self.__entry = wx.TextCtrl(parent=self)
@@ -71,7 +82,7 @@ class TreeViewWindow(wx.Frame):
         btn_sizer.Add(self.__cancel_btn, (0, 1))
 
         # располагаем виджеты
-        sizer.Add(wx.StaticText(self, label='Файл: '), (0, 0), flag=wx.ALIGN_CENTER)
+        sizer.Add(self.__current_file_label, (0, 0), flag=wx.ALIGN_CENTER)
         sizer.Add(self.__current_file, (0, 1), flag=wx.EXPAND)
         sizer.Add(self.__label, (1, 0), flag=wx.ALIGN_CENTER)
         sizer.Add(self.__entry, (1, 1), flag=wx.EXPAND)
@@ -102,11 +113,16 @@ class TreeViewWindow(wx.Frame):
         """
         self.__label.SetLabel(text)
 
+    def _set_current_file_label_text(self, text: str) -> None:
+        self.__current_file_label.SetLabel(text)
+
     def __add_node(self, event: wx.TreeEvent) -> None:
         """
         Добавляет узлы дочерним элементам, если возможно
         :param event: Событие раскрытия узла
         """
+        self.Freeze()
+
         root: wx.TreeItemId = event.GetItem()
         child: wx.TreeItemId; cookie: Any
         child, cookie = self.__tree_view.GetFirstChild(root)
@@ -127,16 +143,22 @@ class TreeViewWindow(wx.Frame):
 
             child, cookie = self.__tree_view.GetNextChild(child, cookie)
 
+        self.Thaw()
+
     def __collapse_and_reset_nodes(self, node: wx.TreeItemId) -> None:
         """
         Закрывает и удаляет у всех дочерних узлов их дочерние узлы
         :param node: Узел, для дочерних узлов которого нужно закрыть и удалить дочерние узлы (формулировка огонь)
         """
+        self.Freeze()
+
         child, cookie = self.__tree_view.GetFirstChild(node)
 
         while child:
             self.__tree_view.CollapseAndReset(child)
             child, cookie = self.__tree_view.GetNextChild(child, cookie)
+
+        self.Thaw()
 
     def __update_entry(self, event: wx.TreeEvent) -> None:
         """
@@ -153,6 +175,8 @@ class TreeViewWindow(wx.Frame):
         Откроет в списке нужный узел при вставке пути в поле
         :param event: Событие вставки в поле ввода
         """
+        self.Freeze()
+
         # приводим путь к нужному формату
         path: str = event.GetString()
         splitted_path = path.replace('\\', '/').split('/')
@@ -181,6 +205,8 @@ class TreeViewWindow(wx.Frame):
                 else:
                     child, cookie = self.__tree_view.GetNextChild(child, cookie)
 
+        self.Thaw()
+
     def _get_current_file_value(self) -> str:
         """
         Получить путь к файлу, над которым выполняется операция
@@ -192,12 +218,5 @@ class TreeViewWindow(wx.Frame):
         Получить выбранный путь
         """
         return self.__entry.GetValue()
-
-    def set_current_filepath(self, filepath: str) -> None:
-        """
-        Выставляет путь к выбранному для перемещения файлу
-        :param filepath: Путь к файлу
-        """
-        self.__current_file.SetValue(filepath)
 
 TreeViewType = TypeVar('TreeViewType', bound=TreeViewWindow)

@@ -1,11 +1,5 @@
-import wx
-import os
 from typing import TypeVar
-
-
-# paths
-PROJECT_PATH = os.path.dirname(os.path.abspath('main.py'))
-ICONS_PATH = os.path.abspath('icons')
+import wx
 
 # time format
 TIME_FORMAT = "%d.%m.%Y %H:%M"
@@ -21,6 +15,7 @@ DUPLICATE_WINDOW_SIZE = wx.Size(600, 200)
 MOVE_WINDOW_SIZE = wx.Size(450, 500)
 
 # styles
+# TODO записать эти значения в json-файл
 FILE_VIEWER_STYLE = wx.LC_REPORT | wx.LC_HRULES | wx.LC_EDIT_LABELS #| wx.LC_NO_HEADER
 DUPLICATE_WINDOW_STYLE = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX
 MAIN_WINDOW_STYLE = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX

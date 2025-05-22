@@ -1,14 +1,14 @@
 from framework.utils.json_reader import JsonReader as _JsonReader
 from models.translation_model import TranslationModel as _TranslationModel
 from framework.utils.path_helper import PathHelper as _PathHelper
+from framework.singleton.singleton import Singleton as _Singleton
 from settings.consts import CURRENT_LANGUAGE
 import os
 
 
-class Settings:
+class Settings(metaclass=_Singleton):
     __translation_model: _TranslationModel = None
     #TODO вынести настройки в json файл, создать модель
-    __instance = None
 
     @classmethod
     def translation(cls) -> _TranslationModel:

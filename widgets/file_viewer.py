@@ -1,13 +1,13 @@
 from __future__ import annotations
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, override
 from settings.consts import FILE_VIEWER_STYLE
 from windows.popup_menu import PopUpMenu
+from framework.observer.observable import Observable
 from framework.utils import FileUtils
 from framework.utils.file_system import FileSystem
-from framework.events import EVT_PATH_CHANGED
+from framework.events import EVT_PATH_CHANGED, AddFileToHistoryEvent
 from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
-from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, WidgetID
-from widgets.control_panel import ControlPanel
+from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags
 import datetime as dt
 import wx
 import re
@@ -18,11 +18,12 @@ if TYPE_CHECKING:
     from widgets.main_panel import MainPanel
 
 
-class FileViewer(wx.ListCtrl):
+class FileViewer(wx.ListCtrl, Observable):
     def __init__(self, parent: MainPanel, id: int = wx.ID_ANY,
                  style: int = FILE_VIEWER_STYLE, pos: wx.Point = wx.DefaultPosition,
                  validator: wx.Validator = wx.DefaultValidator, name: str = wx.ListCtrlNameStr) -> None:
-        super().__init__(parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
+        super(wx.ListCtrl, self).__init__(parent=parent, id=id, style=style, validator=validator, name=name, pos=pos)
+        Observable.__init__(self)
 
         self.SetSize(parent.GetSize())
 
@@ -38,6 +39,11 @@ class FileViewer(wx.ListCtrl):
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
         self.Bind(wx.EVT_LIST_COL_CLICK, self.__change_sort_flag)
+
+    @override
+    def notify(self, filepath: str) -> None:
+        for observer in self._observers:
+            observer.update(filepath)
 
     @property
     def file_system(self) -> FileSystem:
@@ -55,18 +61,11 @@ class FileViewer(wx.ListCtrl):
         # очищаем всё содержимое виджета
         self.ClearAll()
 
-        # изменяем состояние кнопки возврата для соответствующей панели управления
-        parent: MainPanel = self.GetParent()
-        control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
-        control_panel.check_back_btn_enable()
-
-        # отображаем на панели управления правильный путь к директории
         current_path = self.__file_system.GetPath()
-        control_panel.set_filepath(current_path)
-
         # создаём колонки для виджета. Если текущее положение не в корневой папке,
         # то добавляем кнопку подъёма по директории
         self.__create_columns()
+        #TODO не кроссплатформенный вариант
         if re.match(r'\w:/\b', current_path):
             self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
 
@@ -88,10 +87,14 @@ class FileViewer(wx.ListCtrl):
             # выставляем информацию для колонок
             self.SetItem(item_index, 1, str(size_as_bytes))
             self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
+
+        # сообщаем подписчикам об обновлении
+        self.notify(current_path)
+
         # размораживаем виджет
         self.Thaw()
 
-    #TODO создать класс конфигурации, в котором будем хранить положение столбцо
+    #TODO создать класс конфигурации, в котором будем хранить положения столбцов
     def __create_columns(self) -> None:
         """
         Создать колонки для виджета
@@ -102,8 +105,8 @@ class FileViewer(wx.ListCtrl):
         self.__set_default_column_width()
 
     #TODO я не помню, зачем он нужен, может уже можно удалить
-    def __get_items_from_column(self, column: int) -> list[str]:
-        return [self.GetItemText(index, column) for index in range(1, len(self.__file_system.listdir()))]
+    # def __get_items_from_column(self, column: int) -> list[str]:
+    #     return [self.GetItemText(index, column) for index in range(1, len(self.__file_system.listdir()))]
 
     def __set_default_column_width(self) -> None:
         """
@@ -134,20 +137,20 @@ class FileViewer(wx.ListCtrl):
         item_label = self.GetItemText(self.GetFirstSelected())
 
         if item_label == '..':
-            filename: str = self.__file_system.GetPath()
-            filename_lst: list = filename.split('/')
+            filepath: str = self.__file_system.GetPath()
+            filename_lst: list = filepath.split('/')
             filename_lst.pop(-2)
-            filename = '/'.join(filename_lst)
+            filepath = '/'.join(filename_lst)
         else:
-            filename: str = self.__file_system.GetPath() +  item_label
+            filepath: str = self.__file_system.GetPath() +  item_label
 
-        if not FileUtils.is_dir(filename):
-            FileUtils.open_file(filename)
+        if not FileUtils.is_dir(filepath):
+            FileUtils.open_file(filepath)
         else:
             parent: MainPanel = self.GetParent()
-            control_panel: ControlPanel = parent.get_widget(WidgetID.CONTROL_PANEL)
-            control_panel.add_file_to_history(self.__file_system.GetPath())
-            self.__file_system.change_path_to(filename)
+            event = AddFileToHistoryEvent(filepath=self.__file_system.GetPath())
+            wx.PostEvent(parent.GetEventHandler(), event)
+            self.__file_system.change_path_to(filepath)
             self.update()
 
     def __change_sort_flag(self, event: wx.ListEvent) -> None:

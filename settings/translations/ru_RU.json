@@ -7,7 +7,7 @@
   "createDirectory": "Папку",
   "createTextFile": "Текстовый файл",
   "createWordFile": "Документ Microsoft Word",
-  "findDuplicateWindowTitle": "Поиск дубликатов",
+  "duplicateWindowTitle": "Поиск дубликатов",
   "moveWindowTitle": "Переместить файл",
   "moveInto": "Переместить в",
   "move": "Переместить",
@@ -17,5 +17,8 @@
   "oneDirectory": "Найти дубликаты в директории",
   "firstDirectory": "Первая директория:",
   "secondDirectory": "Вторая директория:",
-  "directory": "Директория"
+  "directory": "Директория",
+  "document": "Документ",
+  "ok": "OK",
+  "cancel": "Отмена"
 }

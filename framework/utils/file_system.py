@@ -1,6 +1,6 @@
 from framework.utils.file_utils import FileUtils
-from framework.events.events import PathChangedEvent
 from framework.utils.time_utils import TimeUtils
+from framework.events import PathChanged
 import datetime as dt
 import string
 import wx
@@ -11,18 +11,17 @@ import re
 class FileSystem(wx.FileSystem):
     def __init__(self, parent: wx.Window, filepath: str) -> None:
         super().__init__()
+        self.__parent = parent
 
         filepath = os.path.dirname(filepath)
 
         self.ChangePathTo(filepath, True)
 
-        #TODO возможно стоит сделать класс связку
-        self.__event_handler = parent.EventHandler
-
         # наблюдатель нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
         # на изменение директории не реагирует
         self.__watcher = wx.FileSystemWatcher()
         self.__watcher.Add(filepath)
+
 
     @property
     def watcher(self) -> wx.FileSystemWatcher:
@@ -37,7 +36,9 @@ class FileSystem(wx.FileSystem):
         self.__watcher.RemoveAll()
         self.ChangePathTo(location, True)
         self.__watcher.Add(location)
-        wx.PostEvent(self.__event_handler, PathChangedEvent())
+
+        event = PathChanged()
+        wx.PostEvent(self.__parent.GetEventHandler(), event)
 
     def listdir(self, is_absolute: bool = False) -> list[str]:
         """
@@ -133,6 +134,11 @@ class FileSystem(wx.FileSystem):
         if clipboard.Open():
             clipboard.SetData(wx.TextDataObject(filepath))
             clipboard.Close()
+
+    @classmethod
+    def is_clipboard_empty(cls) -> bool:
+        files = cls.get_data_from_clipboard()
+        return not all([os.path.exists(file) for file in files])
 
     @staticmethod
     def get_data_from_clipboard() -> list[str]:

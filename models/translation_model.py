@@ -10,7 +10,7 @@ class TranslationModel(BaseModel):
     create_directory_label: str = Field(..., alias='createDirectory')
     create_text_file: str = Field(..., alias='createTextFile')
     create_word_file: str = Field(..., alias='createWordFile')
-    find_duplicate_file_window_title: str = Field(..., alias='findDuplicateFileWindowTitle')
+    duplicate_file_window_title: str = Field(..., alias='duplicateFileWindowTitle')
     move_window_title: str = Field(..., alias='moveWindowTitle')
     move_into: str = Field(..., alias='moveInto')
     move_label: str = Field(..., alias='move')

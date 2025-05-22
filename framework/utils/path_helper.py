@@ -1,11 +1,16 @@
-from typing import Final
+from typing import Final, overload
 import os
 
 
 class PathHelper:
     __MAIN_FILE_NAME: Final[str] = 'main.py'
     __ICONS_PATH: Final[str] = 'icons'
+    __FILE_VIEWER_ICONS_DIRECTORY: Final[str] = 'file_viewer'
+    __CONTROL_PANEL_ICONS_DIRECTORY: Final[str] = 'control_panel'
+    __SYSTEM_ICONS_DIRECTORY: Final[str] = 'system'
+    __TOOLBAR_ICONS_DIRECTORY: Final[str] = 'toolbar'
     __TRANSLATION_PATH: Final[str] = 'settings/translations'
+    __ICON_DIRECTORY_FORMAT: Final[str] = '{}x{}'
     __root_path: str = None
 
     @classmethod
@@ -22,10 +27,12 @@ class PathHelper:
     def translations_path(cls) -> str:
         return os.path.join(cls.root_path(), cls.__TRANSLATION_PATH)
 
-    #TODO придумать, как получать размер иконок
     @classmethod
-    def file_viewer_icons_path(cls) -> str:
-        pass
+    def file_viewer_icons_path(cls, icon_size: int | str) -> str:
+        if isinstance(icon_size, int):
+            icon_size = str(icon_size)
+        return os.path.join(cls.icons_path(), cls.__FILE_VIEWER_ICONS_DIRECTORY,
+                            cls.__ICON_DIRECTORY_FORMAT.format(icon_size, icon_size))
 
     @classmethod
     def __find_root_path(cls, path: str) -> str:

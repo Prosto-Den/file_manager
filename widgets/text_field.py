@@ -13,6 +13,7 @@ class TextField(wx.Panel):
         self.__text_field = wx.TextCtrl(self)
         self.__choose_btn = wx.Button(self, label='...')
         self.__choose_btn.SetSize(wx.Size(10, 5))
+        self.__choose_btn.SetToolTip('Выбрать директорию')
 
         sizer.Add(self.__text_field, flag=wx.EXPAND | wx.RIGHT, border=3, proportion=1)
         sizer.Add(self.__choose_btn, flag=wx.EXPAND | wx.SHAPED, border=2)

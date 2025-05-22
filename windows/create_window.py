@@ -2,6 +2,7 @@ import wx
 from settings.icon_manipulators import IconManipulators
 from settings.enums import IconManipulatorID, FileViewerIconID, CreateItemsID, FileFormatID
 from framework.events import CreateEvent
+from settings.settings import settings
 
 
 class CreateWindow(wx.Menu):
@@ -12,9 +13,9 @@ class CreateWindow(wx.Menu):
         icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
         bitmap = wx.Bitmap()
 
-        create_folder = wx.MenuItem(id=CreateItemsID.FOLDER, text='Папку')
-        create_file = wx.MenuItem(id=CreateItemsID.TEXT_FILE, text='Текстовый файл')
-        create_docx = wx.MenuItem(id=CreateItemsID.DOCX_FILE, text='Документ Microsoft Word')
+        create_folder = wx.MenuItem(id=CreateItemsID.FOLDER, text=settings.translation().create_directory_label)
+        create_file = wx.MenuItem(id=CreateItemsID.TEXT_FILE, text=settings.translation().create_text_file)
+        create_docx = wx.MenuItem(id=CreateItemsID.DOCX_FILE, text=settings.translation().create_word_file)
 
         bitmap.CopyFromIcon(icons.GetIcon(FileViewerIconID.FOLDER_ICON))
         create_folder.SetBitmap(bitmap)

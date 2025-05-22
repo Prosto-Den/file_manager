@@ -1,6 +1,7 @@
 from windows.main_window import MainWindow
 from settings.enums import WindowID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_SIZE, ICON_SIZE
+from settings.settings import settings
 from settings.icon_manipulators import IconManipulators
 from framework.utils.path_helper import PathHelper
 import wx
@@ -22,7 +23,7 @@ IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
 IconManipulators.init(IconManipulatorID.SYSTEM, PathHelper.icons_path() + '/system', 100, False)
 
 # окно приложения
-frame = MainWindow(id=WindowID.MAIN_WINDOW, size=MAIN_WINDOW_SIZE, title='Prosto File Manager')
+frame = MainWindow(id=WindowID.MAIN_WINDOW, style=settings.settings().MAIN_WINDOW_STYLE)
 
 # показываем окно и запускаем основной цикл приложения
 frame.show()

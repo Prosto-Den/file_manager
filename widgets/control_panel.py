@@ -8,6 +8,7 @@ from framework.events import PathChanged
 from framework.observer.observer import Observer
 from windows.create_window import CreateWindow
 from typing import TYPE_CHECKING, override
+from settings.settings import settings
 import wx
 
 
@@ -80,14 +81,14 @@ class ControlPanel(wx.Panel, Observer):
 
         # кнопка создания файла
         bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.ADD_ICON))
-        self.__add_btn = wx.Button(parent=self, label='Создать')
+        self.__add_btn = wx.Button(parent=self, label=settings.translation().create_label)
         self.__add_btn.SetBitmap(bitmap)
         self.__add_btn.Fit()
 
         # кнопка "Назад"
         bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.BACK_ARROW))
         self.__back_btn = wx.BitmapButton(parent=self, bitmap=bitmap)
-        self.__back_btn.SetToolTip('Назад')
+        self.__back_btn.SetToolTip(settings.translation().back_tooltip)
         self.__back_btn.Disable()
 
         # кнопка "Вперёд"
@@ -99,7 +100,7 @@ class ControlPanel(wx.Panel, Observer):
         # кнопка "Вставить"
         bitmap.CopyFromIcon(control_panel_icons.GetIcon(ControlPanelIconID.INSERT_ICON))
         self.__insert_btn = wx.BitmapButton(parent=self, bitmap=bitmap)
-        self.__insert_btn.SetToolTip('Вставить')
+        self.__insert_btn.SetToolTip(settings.translation().insert_tooltip)
 
         # строка с текущей файловой директорией
         self.__current_filepath = wx.TextCtrl(parent=self, style=wx.TE_READONLY)

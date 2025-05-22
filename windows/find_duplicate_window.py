@@ -2,7 +2,7 @@ from __future__ import annotations
 from settings.enums import WindowID, Colours, FindDuplicateWindowWidgetsID
 from settings.consts import DUPLICATE_WINDOW_STYLE
 from typing import TYPE_CHECKING
-from settings.settings import Settings
+from settings.settings import settings
 from framework.utils.widgets_helper import WidgetsHelper
 from widgets.text_field import TextField
 import wx
@@ -15,9 +15,10 @@ if TYPE_CHECKING:
 # окно с настройками поиска дубликатов
 class FindDuplicateWindow(wx.Frame):
     def __init__(self, parent: MainWindow, id_ = WindowID.DUPLICATE_WINDOW, size=wx.DefaultSize,
-                 pos: wx.Point= wx.DefaultPosition, title='Поиск дубликатов',
+                 pos: wx.Point= wx.DefaultPosition,
                  style=DUPLICATE_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
-        super().__init__(parent=parent, id=id_, size=size, pos=pos, title=title, style=style, name=name)
+        super().__init__(parent=parent, id=id_, size=size, pos=pos, style=style, name=name)
+        self.SetTitle(settings.translation().duplicate_file_window_title)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         radiobutton_panel = wx.Panel(self)
@@ -27,10 +28,10 @@ class FindDuplicateWindow(wx.Frame):
         # добавляем radiobuttons
         radiobutton_sizer = wx.BoxSizer(wx.VERTICAL)
         two_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.TWO_DIR_RADIO_BTN,
-                                             label='Сравнить две директории')
+                                             label=settings.translation().compare_directories_label)
 
         one_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.ONE_DIR_RADIO_BTN,
-                                             label='Найти дубликаты в директории')
+                                             label=settings.translation().one_directory_label)
         radiobutton_sizer.Add(two_dir_radiobutton, flag=wx.BOTTOM | wx.LEFT | wx.UP, border=5)
         radiobutton_sizer.Add(one_dir_radiobutton, flag=wx.BOTTOM | wx.LEFT, border=5)
 
@@ -39,13 +40,15 @@ class FindDuplicateWindow(wx.Frame):
         self.__one_directory_sizer = wx.GridBagSizer(5, 5)
 
         # two directories sizer
-        self.__two_directories_sizer.Add(wx.StaticText(directories_panel, label='Первая директория:'),
-                                         (0, 0), flag=wx.ALIGN_CENTER | wx.LEFT, border=5)
+        self.__two_directories_sizer.Add(wx.StaticText(directories_panel,
+                                                       label=settings.translation().first_directory_label),
+                                         (0, 0), flag=wx.ALIGN_CENTRE_VERTICAL | wx.LEFT, border=5)
         text_field = TextField(directories_panel)
         text_field.set_text_field_value(parent.get_panel_filepath('LEFT'))
         self.__two_directories_sizer.Add(text_field, (0, 1), flag=wx.EXPAND | wx.RIGHT,
                                          border=5)
-        self.__two_directories_sizer.Add(wx.StaticText(directories_panel, label='Вторая директория:'),
+        self.__two_directories_sizer.Add(wx.StaticText(directories_panel,
+                                                       label=settings.translation().second_directory_label),
                                          (1, 0), flag=wx.ALIGN_CENTER | wx.LEFT, border=5)
 
         text_field = TextField(directories_panel)
@@ -55,8 +58,9 @@ class FindDuplicateWindow(wx.Frame):
         self.__two_directories_sizer.AddGrowableCol(1)
 
         # one directory sizer
-        self.__one_directory_sizer.Add(wx.StaticText(directories_panel, label='Директория:'), (0, 0),
-                                       flag=wx.ALIGN_CENTER)
+        self.__one_directory_sizer.Add(wx.StaticText(directories_panel,
+                                                     label=settings.translation().directory_label), (0, 0),
+                                       flag=wx.ALIGN_CENTER | wx.LEFT, border=5)
 
         text_field = TextField(directories_panel)
         text_field.set_text_field_value(parent.get_panel_filepath('LEFT'))
@@ -68,8 +72,8 @@ class FindDuplicateWindow(wx.Frame):
 
         # sizer для кнопок
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        ok_btn = wx.Button(buttons_panel, label='OK')
-        cancel_btn = wx.Button(buttons_panel, label='Отмена')
+        ok_btn = wx.Button(buttons_panel, label=settings.translation().ok_label)
+        cancel_btn = wx.Button(buttons_panel, label=settings.translation().cancel_label)
         button_sizer.Add(ok_btn, flag=wx.UP, border=5)
         button_sizer.Add(cancel_btn, flag=wx.UP, border=5)
 

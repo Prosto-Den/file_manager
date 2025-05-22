@@ -5,15 +5,17 @@ from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
 from widgets.file_viewer import FileViewer
 from typing import Literal
+from settings.settings import settings
 import wx
 
 
 class MainWindow(wx.Frame):
-    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY, size: wx.Size = wx.DefaultSize,
-                 pos: wx.Point = wx.DefaultPosition, title: str = 'Title',
-                 style=MAIN_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
-        super().__init__(parent=parent, id=id, size=size, pos=pos, title=title, style=style, name=name)
+    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY,
+                 style: int) -> None:
+        super().__init__(parent=parent, id=id, style=style)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
+        self.SetSize(wx.Size(*settings.settings().main_window_size))
+        self.SetTitle(settings.translation().main_title)
 
         # настраиваем toolbar
         self.__toolbar: wx.ToolBar = self.CreateToolBar()
@@ -28,13 +30,17 @@ class MainWindow(wx.Frame):
         self.__toolbar.AddTool(settings_btn)
 
         # создаём панели с виджетами
+        #TODO разобраться с передачей size из настроек (а может вообще лучше передавать размер родителя,
+        # а внутри уже считать, как надо)
         self.__left_panel = MainPanel(parent=self, id_=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
+        #TODO открытые директории тоже надо сохранять в настройках
         self.__left_panel.set_filepath(r'C:/Users/Prosto_Den/Desktop')
         self.__right_panel.set_filepath(r'C:/')
 
         # настраиваем FileViewer
+        #TODO зачем я настраиваю FileViewer тут? Это же можно делать внутри панели
         file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
         file_viewer: FileViewer = self.__left_panel.file_viewer
         file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)

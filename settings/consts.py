@@ -26,4 +26,3 @@ WHITE = wx.Colour(255, 255, 255)
 
 # нужен, чтобы IDE не ругалась на несоответствие типов
 WIDGET = TypeVar('WIDGET', bound=wx.Window)
-CURRENT_LANGUAGE = "ru_RU"

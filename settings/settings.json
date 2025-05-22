@@ -1,5 +1,5 @@
 {
-  "programTitle": "Prosto File Manager",
+  "currentLanguage": "en_EN",
   "timeFormat": "%d.%m.%Y %H:%M",
   "iconSize": 24,
   "mainWindowSize": [1095, 900],
@@ -8,5 +8,9 @@
   "fileViewerSize": [547, 340],
   "popupMenuSize": [100, 200],
   "duplicateWindowSize": [100, 200],
-  "moveWindowSize": [450, 500]
+  "moveWindowSize": [450, 500],
+  "MAIN_WINDOW_STYLE": 541072384,
+  "RENAME_WINDOW_STYLE": 541072384,
+  "DUPLICATE_WINDOW_STYLE": 541072384,
+  "FILE_VIEWER_STYLE": 1058
 }

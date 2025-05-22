@@ -9,6 +9,7 @@ class PathHelper:
     __CONTROL_PANEL_ICONS_DIRECTORY: Final[str] = 'control_panel'
     __SYSTEM_ICONS_DIRECTORY: Final[str] = 'system'
     __TOOLBAR_ICONS_DIRECTORY: Final[str] = 'toolbar'
+    __SETTINGS_PATH: Final[str] = 'settings'
     __TRANSLATION_PATH: Final[str] = 'settings/translations'
     __ICON_DIRECTORY_FORMAT: Final[str] = '{}x{}'
     __root_path: str = None
@@ -22,6 +23,10 @@ class PathHelper:
     @classmethod
     def icons_path(cls) -> str:
         return os.path.join(cls.root_path(), cls.__ICONS_PATH)
+
+    @classmethod
+    def settings_path(cls) -> str:
+        return os.path.join(cls.root_path(), cls.__SETTINGS_PATH)
 
     @classmethod
     def translations_path(cls) -> str:

@@ -7,7 +7,8 @@ from windows.copy_file_window import CopyFileWindow
 from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
 from framework.utils.file_system import FileSystem
 from framework.utils.file_utils import FileUtils
-from framework.base_windows import TreeViewType
+from windows.base_windows import TreeViewType
+from settings.settings import settings
 
 
 class PopUpMenu(wx.PopupTransientWindow):
@@ -18,11 +19,11 @@ class PopUpMenu(wx.PopupTransientWindow):
         self.__event: wx.ListEvent = event.Clone()
         self.__filepath = None
         self.__menu.AppendColumn('', width=100)
-        self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, 'Удалить')
-        self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, 'Переименовать')
-        self.__menu.InsertItem(PopUpItemsID.MOVE_INTO_BTN, 'Переместить в')
-        self.__menu.InsertItem(PopUpItemsID.COPY_INTO_BTN, 'Копировать в')
-        self.__menu.InsertItem(PopUpItemsID.COPY_BTN, 'Копировать')
+        self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, settings.translation().delete_label)
+        self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, settings.translation().rename_label)
+        self.__menu.InsertItem(PopUpItemsID.MOVE_INTO_BTN, settings.translation().move_to_popup_label)
+        self.__menu.InsertItem(PopUpItemsID.COPY_INTO_BTN, settings.translation().copy_to_popup_label)
+        self.__menu.InsertItem(PopUpItemsID.COPY_BTN, settings.translation().copy_label)
 
         self.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=self.__perform)
 

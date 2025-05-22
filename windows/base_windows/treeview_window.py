@@ -4,6 +4,7 @@ from settings.consts import WHITE
 from typing import Any, TypeVar
 import wx
 import os
+from settings.settings import settings
 
 
 #TODO этот класс не кроссплатформенный, работает только на Windows
@@ -42,7 +43,7 @@ class TreeViewWindow(wx.Frame):
         """
         Метод вызывается при нажатии на кнопку. По умолчанию не определён и поднимает ошибку NotImplementedError
         """
-        raise NotImplementedError('Метод не определён')
+        raise NotImplementedError('Method is not implemented')
 
     def _create_layout(self) -> None:
         """
@@ -55,14 +56,14 @@ class TreeViewWindow(wx.Frame):
         sizer = wx.GridBagSizer(5, 5)
 
         # создаём виджеты
-        self.__current_file_label = wx.StaticText(self, label='Файл: ')
+        self.__current_file_label = wx.StaticText(self, label=settings.translation().file_label)
         self.__current_file = wx.TextCtrl(parent=self, style=wx.TE_READONLY)
         self.__current_file.SetBackgroundColour(WHITE)
         self.__entry = wx.TextCtrl(parent=self)
         self.__entry.SetBackgroundColour(WHITE)
         self.__tree_view = wx.TreeCtrl(parent=self, style=wx.TR_HIDE_ROOT | wx.TR_TWIST_BUTTONS | wx.TR_DEFAULT_STYLE)
         self.__perform_btn = wx.Button(self)
-        self.__cancel_btn = wx.Button(self, label='Отмена')
+        self.__cancel_btn = wx.Button(self, label=settings.translation().cancel_label)
         self.__label = wx.StaticText(self)
 
         # наполняем tree view коренными узлами

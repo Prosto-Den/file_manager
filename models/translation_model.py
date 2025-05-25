@@ -1,7 +1,6 @@
 from pydantic import BaseModel, Field
 
 
-#TODO в файле en_EN заменить слово directory на folder
 class TranslationModel(BaseModel):
     main_title: str = Field(..., alias='mainTitle', frozen=True)
     create_label: str = Field(..., alias='create', frozen=True)
@@ -35,3 +34,7 @@ class TranslationModel(BaseModel):
     file_label: str = Field(..., alias='file', frozen=True)
     back_tooltip: str = Field(..., alias='backTooltip', frozen=True)
     insert_tooltip: str = Field(..., alias='insertTooltip', frozen=True)
+    filename_column: str = Field(..., alias='fileNameColumn', frozen=True)
+    file_size_column: str = Field(..., alias='fileSizeColumn', frozen=True)
+    change_date_column: str = Field(..., alias='changeDateColumn', frozen=True)
+    hash_window_title: str = Field(..., alias='hashWindowTitle', frozen=True)

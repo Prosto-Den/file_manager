@@ -1,4 +1,4 @@
-from windows.find_duplicate_window import FindDuplicateWindow
+from windows.duplicate_settings_window import DuplicateSettingsWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
 from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE, WIDGET, DUPLICATE_WINDOW_SIZE
 from settings.icon_manipulators import IconManipulators
@@ -78,4 +78,5 @@ class MainWindow(wx.Frame):
         raise ValueError('Incorrect panel side')
 
     def __find_duplicates(self) -> None:
-        FindDuplicateWindow(parent=self, size=DUPLICATE_WINDOW_SIZE)
+        self.Disable()
+        DuplicateSettingsWindow(parent=self, size=DUPLICATE_WINDOW_SIZE)

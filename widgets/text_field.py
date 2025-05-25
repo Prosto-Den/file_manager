@@ -6,8 +6,8 @@ from framework.events import EVT_PATH_CHOSEN, PathChosen
 
 
 class TextField(wx.Panel):
-    def __init__(self, parent: wx.Window) -> None:
-        super().__init__(parent)
+    def __init__(self, parent: wx.Window, id_: int) -> None:
+        super().__init__(parent, id_)
         sizer = wx.BoxSizer()
 
         self.__text_field = wx.TextCtrl(self)
@@ -27,11 +27,13 @@ class TextField(wx.Panel):
     def set_text_field_value(self, filepath: str) -> None:
         self.__text_field.SetValue(filepath)
 
+    def get_value(self) -> str:
+        return self.__text_field.GetValue()
+
     def __path_chosen(self, event: PathChosen) -> None:
         self.set_text_field_value(event.filepath)
 
     def __perform(self, event: wx.CommandEvent) -> None:
         choose_path = ChoosePathWindow(parent=self, size=MOVE_WINDOW_SIZE)
-        choose_path.set_current_filepath('Текущая директория')
         choose_path.set_current_filepath(self.__text_field.GetValue())
         choose_path.Show()

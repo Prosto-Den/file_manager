@@ -20,7 +20,7 @@
   "oneDirectory": "Найти дубликаты в папке",
   "firstDirectory": "Первая папка:",
   "secondDirectory": "Вторая папка:",
-  "directory": "Папка",
+  "directory": "Папка:",
   "document": "Документ",
   "ok": "OK",
   "cancel": "Отмена",
@@ -28,7 +28,11 @@
   "chosenDirectory": "Выбранная папка: ",
   "choose": "Выбрать",
   "chooseDirectory": "Выбрать папку",
-  "file": "Файл: ",
+  "file": "Файл:",
   "backTooltip": "Назад",
-  "insertTooltip": "Вставить"
+  "insertTooltip": "Вставить",
+  "fileNameColumn": "Имя файла",
+  "fileSizeColumn": "Размер файла",
+  "changeDateColumn": "Дата изменения",
+  "hashWindowTitle": "Вычисление контрольных сумм"
 }

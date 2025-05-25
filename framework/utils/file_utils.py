@@ -1,9 +1,8 @@
-from typing import LiteralString
-import hashlib as hl
+from typing import LiteralString, Literal
+from framework.utils.time_utils import TimeUtils
+from framework.utils.hash_calculator import HashCalculator
 import shutil
 import os
-
-
 
 
 class FileUtils:
@@ -51,6 +50,14 @@ class FileUtils:
         return os.stat(filepath)
 
     @staticmethod
+    def get_modification_date(filepath: str) -> int:
+        return os.stat(filepath).st_ctime_ns
+
+    @classmethod
+    def calc_hash(cls, filepath: str, buffer_size: int) -> tuple[str, str, int]:
+        return HashCalculator.mapped_reader(filepath, buffer_size), filepath, cls.get_modification_date(filepath)
+
+    @staticmethod
     def convert_bytes(size: float) -> str:
         counter = 0
         INFO_SIZES = ('B', 'KB', 'MB', 'GB', 'TB', 'PB')
@@ -61,15 +68,18 @@ class FileUtils:
 
         return f"{size:.2f} {INFO_SIZES[counter]}"
 
-    @staticmethod
-    def calc_checksum(file_path: str) -> str:
-        algorithm = hl.sha1(usedforsecurity=False)
-
-        with open(file_path, 'rb') as file:
-            algorithm.update(file.read())
-
-        return algorithm.hexdigest()
+    @classmethod
+    def is_empty_dir(cls, path: str) -> bool:
+        return len(os.listdir(path)) == 0
 
     @classmethod
-    def is_empty(cls, filepath: str) -> bool:
-        return len(os.listdir(filepath)) == 0
+    def read_file(cls, filepath: str, mode: Literal['r', 'rb'] = 'r') -> str | bytes:
+        """
+        Метод для чтения содержимого файла. Метод загружает все данные из файла в память,
+        НЕ ИСПОЛЬЗОВАТЬ ДЛЯ БОЛЬШИХ ФАЙЛОВ!!!
+        :param filepath: Путь к файлу
+        :param mode: Режим чтения. 'r' - читать как есть, 'rb' - читать, как поток байтов
+        :return: Содержимое файла (строка или байты)
+        """
+        with open(filepath, mode) as file:
+            return file.read()

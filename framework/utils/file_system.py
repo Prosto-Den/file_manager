@@ -1,5 +1,6 @@
 from framework.utils.file_utils import FileUtils
 from framework.utils.time_utils import TimeUtils
+from framework.utils.hash_calculator import HashCalculator
 from framework.events import PathChanged
 import datetime as dt
 import string
@@ -8,12 +9,14 @@ import os
 import re
 
 
+#TODO дописать документацию
 class FileSystem(wx.FileSystem):
     def __init__(self, parent: wx.Window, filepath: str) -> None:
         super().__init__()
         self.__parent = parent
 
-        filepath = os.path.dirname(filepath)
+        if FileUtils.is_file(filepath):
+            filepath = os.path.dirname(filepath)
 
         self.ChangePathTo(filepath, True)
 
@@ -40,25 +43,28 @@ class FileSystem(wx.FileSystem):
         event = PathChanged()
         wx.PostEvent(self.__parent.GetEventHandler(), event)
 
-    def listdir(self, is_absolute: bool = False) -> list[str]:
+    @staticmethod
+    def listdir(path: str, is_absolute: bool = False) -> list[str]:
         """
-        Возвращает список с названиями файлов, которые расположены в директории, куда указывает file manipulator в данный
-        момент.
+        Возвращает список с названиями файлов, которые расположены в директории
+        :param path: Путь к директории
         :param is_absolute: Если True - возвращает список с абсолютными путями к файлам. По умолчанию False.
         :return: Список с названиями файлов
         """
-        files = os.listdir(self.GetPath())
-        return files if not is_absolute else [os.path.join(self.GetPath(), file) for file in files]
+        files = os.listdir(path)
+        return files if not is_absolute else [os.path.join(path, file) for file in files]
 
-    def listdir_with_info(self, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
+    @classmethod
+    def listdir_with_info(cls, path: str, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
         """
         Возвращает список с названиями файлов вместе с дополнительной информацией о них (размер файла + дата последнего
-        изменения). Для папок размер всегда 0.
+        изменения). Для директорий размер всегда 0.
+        :param path: Путь к директории
         :param is_absolute: Если True - возвращает список с абсолютными путями к файлам. По умолчанию False.
         :return: Список с названиями файлов вместе с их размерами и датами последнего изменения
         """
-        files = self.listdir(is_absolute)
-        absolute_file_path = self.listdir(True)
+        files = cls.listdir(path, is_absolute)
+        absolute_file_path = cls.listdir(path, True)
         file_info = [FileUtils.get_file_info(file) for file in absolute_file_path]
         sizes = [info.st_size if FileUtils.is_file(file)
                               else 0 for file, info in zip(absolute_file_path, file_info)]
@@ -66,59 +72,58 @@ class FileSystem(wx.FileSystem):
 
         return list(zip(files, sizes, dates))
 
-    def get_absolute_path(self, file: str) -> str:
+    @classmethod
+    def get_absolute_path(cls, path: str, file: str) -> str:
         """
-        Вернёт абсолютный путь к файлу, если он есть в директории, куда указывает file manipulator,
-        иначе вернёт пустую строку.
+        Вернёт абсолютный путь к файлу, если он есть в директории, иначе вернёт пустую строку.
+        :param path: Путь к директории
         :param file: Название файла
         :return: абсолютный путь к файлу или пустая строка
         """
-        return os.path.join(self.GetPath(), file) if file in self.listdir() else ''
+        return os.path.join(path, file) if file in cls.listdir(path) else ''
 
-    #TODO пока не готово
-    def get_checksums(self) -> dict[str, str]:
-        """
-        Получить контрольные суммы для всех файлов в директории и поддиректориях
-        :return: ???
-        """
-        pass
-
-    def create_folder(self) -> None:
+    #TODO не локализовано
+    @classmethod
+    def create_folder(cls, path: str) -> None:
         """
         Создаёт папку в директории, на которую указывает манипулятор
+        :param path:
         """
-        files = [file for file in self.listdir() if re.match(r'Новая\sпапка\s?\d?', file)]
-        filepath = self.GetPath()
+        files = [file for file in cls.listdir(path) if re.match(r'Новая\sпапка\s?\d?', file)]
         if (length := len(files)) == 0:
-            filepath = os.path.join(filepath, 'Новая папка')
+            path = os.path.join(path, 'Новая папка')
         else:
-            filepath = os.path.join(filepath, f'Новая папка {length}')
-        os.mkdir(filepath)
+            path = os.path.join(path, f'Новая папка {length}')
+        os.mkdir(path)
 
-    def create_file(self, file_format_code: str) -> None:
+    #TODO не локализовано
+    @classmethod
+    def create_file(cls, path: str, file_format_code: str) -> None:
         """
         Создаёт файл в директории, на которую указывает манипулятор с заданным расширением
+        :param path:
         :param file_format_code: Расширение файла
         """
-        files = [file for file in self.listdir() if re.match(rf'Документ\s?\d?{file_format_code}', file)]
-        filepath = self.GetPath()
+        files = [file for file in cls.listdir(path) if re.match(rf'Документ\s?\d?{file_format_code}', file)]
 
         if (length := len(files)) == 0:
-            filepath = os.path.join(filepath, ''.join(('Документ', file_format_code)))
+            path = os.path.join(path, ''.join(('Документ', file_format_code)))
         else:
-            filepath = os.path.join(filepath, ''.join((f'Документ {length}', file_format_code)))
+            path = os.path.join(path, ''.join((f'Документ {length}', file_format_code)))
 
-        file = open(filepath, 'w')
+        file = open(path, 'w')
         file.close()
 
-    def get_total_file_amount(self) -> int:
+    @staticmethod
+    def get_total_file_amount(path: str) -> int:
         """
         Рекурсивно вычисляет количество файлов в директории и поддиректориях
+        :param path:
         :return: Количество файлов
         """
         result = 0
 
-        for _, _, files in os.walk(self.GetPath()):
+        for _, _, files in os.walk(path):
             result += len(files)
 
         return result

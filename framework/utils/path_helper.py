@@ -12,6 +12,8 @@ class PathHelper:
     __SETTINGS_PATH: Final[str] = 'settings'
     __TRANSLATION_PATH: Final[str] = 'settings/translations'
     __ICON_DIRECTORY_FORMAT: Final[str] = '{}x{}'
+    __JARS_DIRECTORY: Final[str] = 'framework/jars'
+    __DATABASE_FILE_NAME: Final[str] = 'database.db'
     __root_path: str = None
 
     @classmethod
@@ -31,6 +33,18 @@ class PathHelper:
     @classmethod
     def translations_path(cls) -> str:
         return os.path.join(cls.root_path(), cls.__TRANSLATION_PATH)
+
+    @classmethod
+    def jars_path(cls) -> str:
+        return os.path.join(cls.root_path(), cls.__JARS_DIRECTORY)
+
+    @classmethod
+    def database_path(cls) -> str:
+        return os.path.join(cls.root_path(), cls.__SETTINGS_PATH, cls.__DATABASE_FILE_NAME)
+
+    @classmethod
+    def system_icons_path(cls) -> str:
+        return os.path.join(cls.root_path(), cls.__ICONS_PATH, cls.__SYSTEM_ICONS_DIRECTORY)
 
     @classmethod
     def file_viewer_icons_path(cls, icon_size: int | str) -> str:

@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field
 
 
 class SettingsModel(BaseModel):
+    buffer_size: int = Field(..., alias='bufferSize')
     current_language: str = Field(..., alias='currentLanguage')
     time_format: str = Field(..., alias='timeFormat')
     icon_size: int = Field(..., alias='iconSize')

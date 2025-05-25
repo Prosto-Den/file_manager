@@ -70,7 +70,7 @@ class FileViewer(wx.ListCtrl, Observable):
             self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
 
         # получаем файлы текущей директории. Сортируем их согласно флагу
-        files = self.__file_system.listdir_with_info()
+        files = self.__file_system.listdir_with_info(self.__file_system.GetPath())
         self.__sort(files)
 
         # заполняем виджет

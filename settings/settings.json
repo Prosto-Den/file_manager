@@ -1,5 +1,6 @@
 {
-  "currentLanguage": "en_EN",
+  "bufferSize": 131072000,
+  "currentLanguage": "ru_RU",
   "timeFormat": "%d.%m.%Y %H:%M",
   "iconSize": 24,
   "mainWindowSize": [1095, 900],

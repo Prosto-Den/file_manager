@@ -35,9 +35,7 @@ class MainPanel(wx.Panel):
         self.__file_viewer.detach(self.__control_panel)
         return super().Destroy()
 
-
     def set_filepath(self, filepath: str) -> None:
-        self.__control_panel.set_filepath(filepath)
         self.__file_viewer.file_system.change_path_to(filepath)
 
     def get_filepath(self) -> str:

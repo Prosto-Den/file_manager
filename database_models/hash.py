@@ -15,7 +15,7 @@ class HashQueries:
     select_all_duplicates: str = """select t.*, dup.filepath as dup_filepath, 
     dup.modification_date as dup_modification_date from Hash t 
     join (select * from Hash group by hash having count(*) > 1) dup 
-    on t.hash = dup.hash and t.filepath != dup.filepath;"""
+    on t.hash = dup.hash and t.filepath != dup.filepath order by t.filepath;"""
     insert: str = "insert into Hash values(?, ?, ?);"
     delete: str = "delete from Hash where {} = ?;"
 
@@ -87,6 +87,8 @@ class HashModel:
     @classmethod
     def insert(cls, hash_: str, filepath: str, modification_date: str) -> None:
         cursor = cls.__conn.cursor()
+        # на всякий случай ещё раз меняем пути
+        filepath.replace('\\', "/")
         cursor.execute(HashQueries.insert, (hash_, filepath, modification_date))
         cls.__conn.commit()
 
@@ -98,3 +100,10 @@ class HashModel:
         if data is None:
             return None
         return [cls.DuplicateFields(*item) for item in data]
+
+    @classmethod
+    def delete(cls, filepath: str) -> None:
+        cursor = cls.__conn.cursor()
+        query = HashQueries.delete.format('filepath')
+        cursor.execute(query, (filepath, ))
+        cls.__conn.commit()

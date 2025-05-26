@@ -43,7 +43,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                 item_id: int = list_ctrl.GetFirstSelected()
                 while item_id != -1:
                     item_text: str = list_ctrl.GetItem(item_id).GetText()
-                    item_filepath = os.path.join(self.__filepath, item_text)
+                    item_filepath = FileSystem.path_join(self.__filepath, item_text)
                     FileUtils.delete_file(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 
@@ -54,7 +54,8 @@ class PopUpMenu(wx.PopupTransientWindow):
                 position: wx.Point = list_ctrl.ClientToScreen(item_position)
                 # смещаем вправо на размер иконки
                 position = wx.Point(position[0] + ICON_SIZE, position[1])
-                RenameWindow(self.GetParent(), position, os.path.join(self.__filepath, self.__event.GetText()))
+                RenameWindow(self.GetParent(), position,
+                             FileSystem.path_join(self.__filepath, self.__event.GetText()))
 
             # перемещение файла
             case PopUpItemsID.MOVE_INTO_BTN:
@@ -72,7 +73,7 @@ class PopUpMenu(wx.PopupTransientWindow):
                 files = []
                 while item_id != -1:
                     item_text: str = list_ctrl.GetItem(item_id).GetText()
-                    item_filepath = os.path.join(self.__filepath, item_text)
+                    item_filepath = FileSystem.path_join(self.__filepath, item_text)
                     files.append(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 

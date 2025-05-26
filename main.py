@@ -4,6 +4,7 @@ from settings.consts import ICON_SIZE
 from settings.settings import settings
 from settings.icon_manipulators import IconManipulators
 from framework.utils.path_helper import PathHelper
+from framework.utils.file_system import FileSystem
 from framework.database.database import Database
 from database_models.hash import HashModel
 import multiprocessing as mp
@@ -16,7 +17,7 @@ if __name__ == '__main__':
     mp.set_start_method('spawn')
     # приложение
     app = wx.App()
-    jpype.startJVM(classpath=[os.path.join(PathHelper.jars_path(), 'HashTest-1.0-SNAPSHOT.jar')])
+    jpype.startJVM(classpath=[FileSystem.path_join(PathHelper.jars_path(), 'HashTest-1.0-SNAPSHOT.jar')])
     #TODO чёт много методов, может быть сделаю попроще
     Database.establish_connection(PathHelper.database_path())
     HashModel.connect(Database.connection())

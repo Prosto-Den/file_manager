@@ -73,7 +73,7 @@ class TreeViewWindow(wx.Frame):
             disk = self.__tree_view.AppendItem(root, drive, data=drive)
             files = os.listdir(self.__tree_view.GetItemText(disk))
             for file in files:
-                path = os.path.join(drive, file)
+                path = FileSystem.path_join(drive, file)
                 if FileUtils.is_dir(path):
                     self.__tree_view.AppendItem(parent=disk, text=file, data=path)
 
@@ -134,8 +134,8 @@ class TreeViewWindow(wx.Frame):
             try:
                 files: list[str] = os.listdir(child_data)
                 for file in files:
-                    path = os.path.join(child_data, file)
-                    if FileUtils.is_dir(os.path.join(path)):
+                    path = FileSystem.path_join(child_data, file)
+                    if FileUtils.is_dir(path):
                         self.__tree_view.AppendItem(parent=child, text=file, data=path)
 
             #TODO заменить pass на запись в логи

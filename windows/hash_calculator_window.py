@@ -4,6 +4,7 @@ from settings.settings import settings
 from settings.enums import Colours
 from framework.utils.threads_handler import HashCalculatorThread
 from framework.utils.path_helper import PathHelper
+from framework.utils.file_system import FileSystem
 from typing import override
 from windows.duplicate_result_window import DuplicateResult
 import os
@@ -12,8 +13,6 @@ import os
 class HashCalculatorWindow(wx.Frame):
     def __init__(self, parent: wx.Window) -> None:
         super().__init__(parent=parent)
-        parent.Disable()
-        print(self.GetSize())
         self.SetSize(wx.Size(400, 150))
         self.SetTitle(settings.translation().hash_window_title)
 
@@ -22,9 +21,10 @@ class HashCalculatorWindow(wx.Frame):
         self.__stop_btn = wx.Button(self, label=settings.translation().cancel_label)
         self.__timer = wx.Timer(self)
         self.__paths = []
+        self.__is_recursive = False
 
         gif_image = wx.adv.AnimationCtrl(self)
-        gif_image.LoadFile(os.path.join(PathHelper.system_icons_path(), 'loading.gif'),
+        gif_image.LoadFile(FileSystem.path_join(PathHelper.system_icons_path(), 'loading.gif'),
                            wx.adv.ANIMATION_TYPE_GIF)
 
         gif_image.SetBackgroundColour(Colours.WHITE)
@@ -55,13 +55,16 @@ class HashCalculatorWindow(wx.Frame):
     def add_path(self, path: str) -> None:
         self.__paths.append(path)
 
+    def set_recursive_value(self, value: bool) -> None:
+        self.__is_recursive = value
+
     def __start_calculation(self):
         if len(self.__paths) is None:
             self.__cleanup()
             return
 
         for path in self.__paths:
-            HashCalculatorThread.create_thread(path, settings.settings().buffer_size)
+            HashCalculatorThread.create_thread(path, settings.settings().buffer_size, self.__is_recursive)
         HashCalculatorThread.start()
         self.__timer.Start(100)
 

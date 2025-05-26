@@ -91,7 +91,11 @@ class FindDuplicateWindowWidgetsID(IntEnum):
     FIRST_DIR_INPUT = auto()
     SECOND_DIR_INPUT = auto()
     DIRECTORIES_PANEL = auto()
+    RECURSIVE_CHECKBOX = auto()
 
 
 class Colours:
     WHITE = Colour(255, 255, 255)
+    LIGHT_GREEN = Colour(160, 255, 144)
+    DARK_GREEN = Colour(133, 212, 120)
+    GREY = Colour(237, 237, 237)

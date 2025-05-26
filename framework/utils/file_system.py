@@ -1,6 +1,5 @@
 from framework.utils.file_utils import FileUtils
 from framework.utils.time_utils import TimeUtils
-from framework.utils.hash_calculator import HashCalculator
 from framework.events import PathChanged
 import datetime as dt
 import string
@@ -43,8 +42,8 @@ class FileSystem(wx.FileSystem):
         event = PathChanged()
         wx.PostEvent(self.__parent.GetEventHandler(), event)
 
-    @staticmethod
-    def listdir(path: str, is_absolute: bool = False) -> list[str]:
+    @classmethod
+    def listdir(cls, path: str, is_absolute: bool = False) -> list[str]:
         """
         Возвращает список с названиями файлов, которые расположены в директории
         :param path: Путь к директории
@@ -52,7 +51,7 @@ class FileSystem(wx.FileSystem):
         :return: Список с названиями файлов
         """
         files = os.listdir(path)
-        return files if not is_absolute else [os.path.join(path, file) for file in files]
+        return files if not is_absolute else [cls.path_join(path, file) for file in files]
 
     @classmethod
     def listdir_with_info(cls, path: str, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
@@ -68,7 +67,7 @@ class FileSystem(wx.FileSystem):
         file_info = [FileUtils.get_file_info(file) for file in absolute_file_path]
         sizes = [info.st_size if FileUtils.is_file(file)
                               else 0 for file, info in zip(absolute_file_path, file_info)]
-        dates = [TimeUtils.ns_to_datetime(info.st_ctime_ns) for info in file_info]
+        dates = [TimeUtils.ns_to_datetime(info.st_mtime_ns) for info in file_info]
 
         return list(zip(files, sizes, dates))
 
@@ -80,7 +79,7 @@ class FileSystem(wx.FileSystem):
         :param file: Название файла
         :return: абсолютный путь к файлу или пустая строка
         """
-        return os.path.join(path, file) if file in cls.listdir(path) else ''
+        return cls.path_join(path, file) if file in cls.listdir(path) else ''
 
     #TODO не локализовано
     @classmethod
@@ -91,9 +90,9 @@ class FileSystem(wx.FileSystem):
         """
         files = [file for file in cls.listdir(path) if re.match(r'Новая\sпапка\s?\d?', file)]
         if (length := len(files)) == 0:
-            path = os.path.join(path, 'Новая папка')
+            path = cls.path_join(path, 'Новая папка')
         else:
-            path = os.path.join(path, f'Новая папка {length}')
+            path = cls.path_join(path, f'Новая папка {length}')
         os.mkdir(path)
 
     #TODO не локализовано
@@ -107,9 +106,9 @@ class FileSystem(wx.FileSystem):
         files = [file for file in cls.listdir(path) if re.match(rf'Документ\s?\d?{file_format_code}', file)]
 
         if (length := len(files)) == 0:
-            path = os.path.join(path, ''.join(('Документ', file_format_code)))
+            path = cls.path_join(path, ''.join(('Документ', file_format_code)))
         else:
-            path = os.path.join(path, ''.join((f'Документ {length}', file_format_code)))
+            path = cls.path_join(path, ''.join((f'Документ {length}', file_format_code)))
 
         file = open(path, 'w')
         file.close()
@@ -139,6 +138,12 @@ class FileSystem(wx.FileSystem):
         if clipboard.Open():
             clipboard.SetData(wx.TextDataObject(filepath))
             clipboard.Close()
+
+    @staticmethod
+    def path_join(*args: str) -> str:
+        root, *other = args
+        path = os.path.join(root, *other)
+        return path.replace('\\', '/')
 
     @classmethod
     def is_clipboard_empty(cls) -> bool:

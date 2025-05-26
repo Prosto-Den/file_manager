@@ -77,7 +77,7 @@ class FileViewer(wx.ListCtrl, Observable):
         index: int; file: str; size: int; date: dt.datetime
         for index, (file, size, date) in enumerate(files, start=1):
             # определяем абсолютный путь до файла
-            path = os.path.join(self.__file_system.GetPath(), file)
+            path = FileSystem.path_join(self.__file_system.GetPath(), file)
             is_directory: bool = FileUtils.is_dir(path)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
             # переводим размер файла из байтов в КБ, МБ и прочее

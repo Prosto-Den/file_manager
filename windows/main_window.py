@@ -1,6 +1,7 @@
 from windows.duplicate_settings_window import DuplicateSettingsWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
-from settings.consts import MAIN_WINDOW_STYLE, PANEL_SIZE, WIDGET, DUPLICATE_WINDOW_SIZE
+from settings.consts import PANEL_SIZE, DUPLICATE_WINDOW_SIZE
+from windows.duplicate_result_window import DuplicateResult
 from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
 from widgets.file_viewer import FileViewer
@@ -36,8 +37,8 @@ class MainWindow(wx.Frame):
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
         #TODO открытые директории тоже надо сохранять в настройках
-        self.__left_panel.set_filepath(r'C:/Users/Prosto_Den/Desktop')
-        self.__right_panel.set_filepath(r'C:/')
+        self.__left_panel.set_filepath('C:/Users/Prosto_Den/Desktop')
+        self.__right_panel.set_filepath('C:/')
 
         # настраиваем FileViewer
         #TODO зачем я настраиваю FileViewer тут? Это же можно делать внутри панели
@@ -80,3 +81,4 @@ class MainWindow(wx.Frame):
     def __find_duplicates(self) -> None:
         self.Disable()
         DuplicateSettingsWindow(parent=self, size=DUPLICATE_WINDOW_SIZE)
+        #DuplicateResult(self)

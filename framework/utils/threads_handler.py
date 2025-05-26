@@ -36,12 +36,15 @@ class HashCalculatorThread:
         # обходим по всему, что есть в директории (игнорируем папки)
         for current, _, files in os.walk(path):
             for file in files:
-                filepath = os.path.join(current, file)
+                filepath = FileSystem.path_join(current, file)
                 modification_date = FileUtils.get_modification_date(filepath)
                 data = HashModel.select_by_filepath(filepath)
 
                 # если в БД нет данных о файле, или у них не совпадают даты изменения, то вычисляем новую хеш-сумму
                 if data is None or data.modification_date != modification_date:
+                    # не забываем удалить неактуальную информацию
+                    if data is not None:
+                        HashModel.delete(data.file_path)
                     HashModel.insert(*FileUtils.calc_hash(filepath, buffer_size))
 
             # выходим, если не нужны рекурсивные вычисления

@@ -5,7 +5,6 @@ from typing import TYPE_CHECKING, override
 from settings.settings import settings
 from framework.utils.widgets_helper import WidgetsHelper
 from windows.hash_calculator_window import HashCalculatorWindow
-from windows.duplicate_result_window import DuplicateResult
 from widgets.text_field import TextField
 import wx
 
@@ -28,19 +27,24 @@ class DuplicateSettingsWindow(wx.Frame):
         buttons_panel = wx.Panel(self)
 
         # добавляем radiobuttons
-        radiobutton_sizer = wx.BoxSizer(wx.VERTICAL)
+        #radiobutton_sizer = wx.BoxSizer(wx.VERTICAL)
+        radiobutton_sizer = wx.GridBagSizer(5, 5)
         two_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.TWO_DIR_RADIO_BTN,
                                              label=settings.translation().compare_directories_label)
 
         one_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.ONE_DIR_RADIO_BTN,
                                              label=settings.translation().one_directory_label)
-        radiobutton_sizer.Add(two_dir_radiobutton, flag=wx.BOTTOM | wx.LEFT | wx.UP, border=5)
-        radiobutton_sizer.Add(one_dir_radiobutton, flag=wx.BOTTOM | wx.LEFT, border=5)
+        recursive_checkbox = wx.CheckBox(radiobutton_panel, id=FindDuplicateWindowWidgetsID.RECURSIVE_CHECKBOX,
+                                         label='Рекурсивный поиск')
+        radiobutton_sizer.Add(two_dir_radiobutton, pos=(0, 0), flag=wx.BOTTOM | wx.LEFT | wx.UP, border=5)
+        radiobutton_sizer.Add(recursive_checkbox, pos=(0, 1), flag=wx.BOTTOM | wx.UP, border=5)
+        radiobutton_sizer.Add(one_dir_radiobutton, pos=(1, 0), flag=wx.BOTTOM | wx.LEFT, border=5)
 
         # sizers для панели с директориями
         self.__two_directories_sizer = wx.GridBagSizer(5, 5)
         self.__one_directory_sizer = wx.GridBagSizer(5, 5)
         self.__current_state = 0
+        self.__is_recursive = False
 
         # two directories sizer
         self.__two_directories_sizer.Add(wx.StaticText(directories_panel,
@@ -93,6 +97,7 @@ class DuplicateSettingsWindow(wx.Frame):
         # подписка на события
         two_dir_radiobutton.Bind(wx.EVT_RADIOBUTTON, self.__switch_sizer)
         one_dir_radiobutton.Bind(wx.EVT_RADIOBUTTON, self.__switch_sizer)
+        recursive_checkbox.Bind(wx.EVT_CHECKBOX, lambda _: self.__change_recursive_value())
         ok_btn.Bind(wx.EVT_BUTTON, lambda _: self.__start_searching())
         cancel_btn.Bind(wx.EVT_BUTTON, lambda _: self.Destroy())
 
@@ -101,7 +106,7 @@ class DuplicateSettingsWindow(wx.Frame):
         self.Show()
 
     @override
-    def Destroy(self) -> bool:
+    def Destroy(self):
         self.GetParent().Enable()
         return super().Destroy()
 
@@ -116,9 +121,9 @@ class DuplicateSettingsWindow(wx.Frame):
             hash_calculator_window.add_path(first_text_field.get_value())
             hash_calculator_window.add_path(second_text_field.get_value())
 
-        #hash_calculator_window.Show()
-        DuplicateResult(self.GetParent())
-        self.Destroy()
+        hash_calculator_window.set_recursive_value(self.__is_recursive)
+        hash_calculator_window.Show()
+        self.Close()
 
     def __switch_sizer(self, event: wx.CommandEvent) -> None:
         directories_panel: wx.Panel = self.FindWindowById(FindDuplicateWindowWidgetsID.DIRECTORIES_PANEL)
@@ -136,3 +141,7 @@ class DuplicateSettingsWindow(wx.Frame):
                 directories_panel.SetSizer(self.__one_directory_sizer, False)
         directories_panel.Layout()
         directories_panel.Thaw()
+
+    def __change_recursive_value(self) -> None:
+        recursive_checkbox: wx.CheckBox = self.FindWindowById(FindDuplicateWindowWidgetsID.RECURSIVE_CHECKBOX, self)
+        self.__is_recursive = recursive_checkbox.GetValue()

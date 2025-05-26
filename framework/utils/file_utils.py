@@ -51,7 +51,7 @@ class FileUtils:
 
     @staticmethod
     def get_modification_date(filepath: str) -> int:
-        return os.stat(filepath).st_ctime_ns
+        return os.stat(filepath).st_mtime_ns
 
     @classmethod
     def calc_hash(cls, filepath: str, buffer_size: int) -> tuple[str, str, int]:

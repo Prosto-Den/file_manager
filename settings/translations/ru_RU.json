@@ -34,5 +34,9 @@
   "fileNameColumn": "Имя файла",
   "fileSizeColumn": "Размер файла",
   "changeDateColumn": "Дата изменения",
-  "hashWindowTitle": "Вычисление контрольных сумм"
+  "hashWindowTitle": "Поиск дубликатов",
+  "newFolderTemplate": "Новая\\sпапка\\s?\\d?",
+  "newFolder": "Новая папка {}",
+  "newDocumentTemplate": "Документ\\s?\\d?{}",
+  "newDocument": "Документ {}"
 }

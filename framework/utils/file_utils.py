@@ -6,6 +6,9 @@ import os
 
 
 class FileUtils:
+    """
+    Утилита для взаимодействия с файлами
+    """
     # TODO при большом количестве файлов удаление происходит медленно, нужно продумать индикацию
     @classmethod
     def delete_file(cls, filepath: str) -> None:

@@ -11,12 +11,12 @@ import wx
 
 
 class MainWindow(wx.Frame):
-    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY,
-                 style: int) -> None:
-        super().__init__(parent=parent, id=id, style=style)
+    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY) -> None:
+        super().__init__(parent=parent, id=id)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
         self.SetSize(wx.Size(*settings.settings().main_window_size))
         self.SetTitle(settings.translation().main_title)
+        self.SetWindowStyle(settings.settings().MAIN_WINDOW_STYLE)
 
         # настраиваем toolbar
         self.__toolbar: wx.ToolBar = self.CreateToolBar()

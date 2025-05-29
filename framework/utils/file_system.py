@@ -27,13 +27,16 @@ class FileSystem(wx.FileSystem):
 
     @property
     def watcher(self) -> wx.FileSystemWatcher:
+        """
+        Наблюдатель отслеживает изменения в файловой системе
+        :return: wx.FileSystemWatcher
+        """
         return self.__watcher
 
     def change_path_to(self, location: str) -> None:
         """
-        Меняет текущую директорию манипулятора
+        Меняет текущую директорию системы
         :param location: Путь к новой директории
-        :return:
         """
         self.__watcher.RemoveAll()
         self.ChangePathTo(location, True)
@@ -81,7 +84,7 @@ class FileSystem(wx.FileSystem):
         """
         return cls.path_join(path, file) if file in cls.listdir(path) else ''
 
-    #TODO не локализовано
+    #TODO добавить параметр folder_name, который будем брать из настроек, а тут уже форматировать как надо
     @classmethod
     def create_folder(cls, path: str) -> None:
         """
@@ -95,7 +98,7 @@ class FileSystem(wx.FileSystem):
             path = cls.path_join(path, f'Новая папка {length}')
         os.mkdir(path)
 
-    #TODO не локализовано
+    #TODO добавить параметр file_name, который будем брать из настроек, а тут уже форматировать как надо
     @classmethod
     def create_file(cls, path: str, file_format_code: str) -> None:
         """
@@ -113,6 +116,7 @@ class FileSystem(wx.FileSystem):
         file = open(path, 'w')
         file.close()
 
+    #TODO нужен ли этот метод?
     @staticmethod
     def get_total_file_amount(path: str) -> int:
         """
@@ -129,8 +133,14 @@ class FileSystem(wx.FileSystem):
 
     @staticmethod
     def get_logical_drives() -> list[str]:
+        """
+        Возвращает все диски буквенные обозначения для информационных носителей.
+        Актуально только для Windows
+        :return:
+        """
         return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
 
+    #TODO кринжовая функция
     @staticmethod
     def copy_to_clipboard(filepath: str) -> None:
         clipboard: wx.Clipboard = wx.Clipboard.Get()
@@ -139,6 +149,7 @@ class FileSystem(wx.FileSystem):
             clipboard.SetData(wx.TextDataObject(filepath))
             clipboard.Close()
 
+    #TODO заменить все использования этого метода аналогичным из PathHelper
     @staticmethod
     def path_join(*args: str) -> str:
         root, *other = args
@@ -150,6 +161,7 @@ class FileSystem(wx.FileSystem):
         files = cls.get_data_from_clipboard()
         return not all([os.path.exists(file) for file in files])
 
+    #TODO заменить разделитель
     @staticmethod
     def get_data_from_clipboard() -> list[str]:
         clipboard: wx.Clipboard = wx.Clipboard.Get()

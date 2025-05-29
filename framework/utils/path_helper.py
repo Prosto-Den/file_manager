@@ -1,8 +1,9 @@
-from typing import Final, overload
+from typing import Final
 from framework.utils.file_system import FileSystem
 import os
 
 
+#TODO нет документации
 class PathHelper:
     __MAIN_FILE_NAME: Final[str] = 'main.py'
     __ICONS_PATH: Final[str] = 'icons'
@@ -16,6 +17,17 @@ class PathHelper:
     __JARS_DIRECTORY: Final[str] = 'framework/jars'
     __DATABASE_FILE_NAME: Final[str] = 'database.db'
     __root_path: str = None
+
+    @staticmethod
+    def join(*args: str) -> str:
+        """
+        Обёртка над os.path.join. Приводит пути к единому формату, что помогает избежать ошибок
+        :param args: Пути для соединения
+        :return: Итоговый путь
+        """
+        root, *other = args
+        path = os.path.join(root, *other)
+        return path.replace('\\', '/')
 
     @classmethod
     def root_path(cls) -> str:

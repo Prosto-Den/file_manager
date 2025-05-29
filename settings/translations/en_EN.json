@@ -34,5 +34,9 @@
   "fileNameColumn": "File name",
   "fileSizeColumn": "File size",
   "changeDateColumn": "Change date",
-  "hashWindowTitle": "Hash calculation"
+  "hashWindowTitle": "Hash calculation",
+  "newFolderTemplate": "New\\sfolder\\s?\\d?",
+  "newFolder": "New folder {}",
+  "newDocumentTemplate": "Document\\s?\\d?{}",
+  "newDocument": "Document {}"
 }

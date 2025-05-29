@@ -1,4 +1,7 @@
 class Singleton(type):
+    """
+    Класс для реализации паттерна Singleton
+    """
     __instances = {}
 
     def __call__(cls, *args, **kwargs):

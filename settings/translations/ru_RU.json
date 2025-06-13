@@ -34,9 +34,8 @@
   "fileNameColumn": "Имя файла",
   "fileSizeColumn": "Размер файла",
   "changeDateColumn": "Дата изменения",
-  "hashWindowTitle": "Вычисление контрольных сумм",
   "accessDeniedTitle": "Пып",
-  "accessDeniedText": "Нет доступа на чтение директории"
+  "accessDeniedText": "Нет доступа на чтение директории",
   "hashWindowTitle": "Поиск дубликатов",
   "newFolderTemplate": "Новая\\sпапка\\s?\\d?",
   "newFolder": "Новая папка {}",

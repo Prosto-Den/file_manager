@@ -58,7 +58,7 @@ class HashCalculatorWindow(wx.Frame):
             return
 
         for path in self.__paths:
-            HashCalculatorThread.create_thread(path, settings.settings().buffer_size, self.__is_recursive)
+            HashCalculatorThread.create_thread(path, settings.instance().buffer_size, self.__is_recursive)
         HashCalculatorThread.start()
         self.__timer.Start(100)
 

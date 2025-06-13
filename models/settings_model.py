@@ -17,7 +17,7 @@ class SettingsModel(BaseModel):
     popup_menu_size: list = Field(..., alias='popupMenuSize')
     duplicate_window_size: list = Field(..., alias='popupMenuSize')
     move_window_size: list = Field(..., alias='moveWindowSize')
-    MAIN_WINDOW_STYLE: int
-    RENAME_WINDOW_STYLE: int
-    DUPLICATE_WINDOW_STYLE: int
-    FILE_VIEWER_STYLE: int
+    MAIN_WINDOW_STYLE: int = Field(..., alias='mainWindowStyle', frozen=True)
+    RENAME_WINDOW_STYLE: int = Field(..., alias='renameWindowStyle', frozen=True)
+    DUPLICATE_WINDOW_STYLE: int = Field(..., alias='duplicateWindowStyle', frozen=True)
+    FILE_VIEWER_STYLE: int = Field(..., alias='fileViewerStyle', frozen=True)

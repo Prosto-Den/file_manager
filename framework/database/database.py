@@ -29,4 +29,5 @@ class Database(metaclass=Singleton):
         """
         Отключаемся от БД
         """
-        cls.__connection.close()
+        if cls.__connection:
+            cls.__connection.close()

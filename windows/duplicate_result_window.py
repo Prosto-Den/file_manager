@@ -43,7 +43,7 @@ class DuplicateResult(wx.Frame):
 class OriginalFile:
     def __init__(self, filename: str, modification_date: int, filepath: str, hash_: str) -> None:
         self.filename = filename
-        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.settings().time_format)
+        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.instance().time_format)
         self.filepath = filepath
         self.hash = hash_
         self.duplicates = []
@@ -52,7 +52,7 @@ class OriginalFile:
 class DuplicateFile:
     def __init__(self, filename: str, modification_date: int, filepath: str, hash_: str) -> None:
         self.filename = filename
-        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.settings().time_format)
+        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.instance().time_format)
         self.filepath = filepath
         self.hash = hash_
 

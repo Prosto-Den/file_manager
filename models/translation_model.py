@@ -38,3 +38,5 @@ class TranslationModel(BaseModel):
     file_size_column: str = Field(..., alias='fileSizeColumn', frozen=True)
     change_date_column: str = Field(..., alias='changeDateColumn', frozen=True)
     hash_window_title: str = Field(..., alias='hashWindowTitle', frozen=True)
+    access_denied_title: str = Field(..., alias='accessDeniedTitle', frozen=True)
+    access_denied_text: str = Field(..., alias='accessDeniedText', frozen=True)

@@ -34,5 +34,7 @@
   "fileNameColumn": "File name",
   "fileSizeColumn": "File size",
   "changeDateColumn": "Change date",
-  "hashWindowTitle": "Hash calculation"
+  "hashWindowTitle": "Hash calculation",
+  "accessDeniedTitle": "BEBOP",
+  "accessDeniedText": "Access Denied :("
 }

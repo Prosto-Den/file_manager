@@ -34,5 +34,7 @@
   "fileNameColumn": "Имя файла",
   "fileSizeColumn": "Размер файла",
   "changeDateColumn": "Дата изменения",
-  "hashWindowTitle": "Вычисление контрольных сумм"
+  "hashWindowTitle": "Вычисление контрольных сумм",
+  "accessDeniedTitle": "Пып",
+  "accessDeniedText": "Нет доступа на чтение директории"
 }

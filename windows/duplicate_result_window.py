@@ -1,5 +1,3 @@
-from msilib.schema import Class
-
 import wx.dataview as dv
 import wx
 from typing import override, overload

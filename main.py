@@ -16,6 +16,7 @@ import os
 if __name__ == '__main__':
     mp.set_start_method('spawn')
     # приложение
+    wx.DisableAsserts()
     app = wx.App()
     jpype.startJVM(classpath=[FileSystem.path_join(PathHelper.jars_path(), 'HashTest-1.0-SNAPSHOT.jar')])
     #TODO чёт много методов, может быть сделаю попроще

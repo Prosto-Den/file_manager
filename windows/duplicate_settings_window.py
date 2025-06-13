@@ -123,7 +123,7 @@ class DuplicateSettingsWindow(wx.Frame):
 
         hash_calculator_window.set_recursive_value(self.__is_recursive)
         hash_calculator_window.Show()
-        self.Close()
+        self.Destroy()
 
     def __switch_sizer(self, event: wx.CommandEvent) -> None:
         directories_panel: wx.Panel = self.FindWindowById(FindDuplicateWindowWidgetsID.DIRECTORIES_PANEL)

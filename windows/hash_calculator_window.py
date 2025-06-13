@@ -7,7 +7,6 @@ from framework.utils.path_helper import PathHelper
 from framework.utils.file_system import FileSystem
 from typing import override
 from windows.duplicate_result_window import DuplicateResult
-import os
 
 
 class HashCalculatorWindow(wx.Frame):
@@ -35,16 +34,11 @@ class HashCalculatorWindow(wx.Frame):
                   flag=wx.ALIGN_CENTER)
         sizer.Add(self.__stop_btn, flag=wx.ALIGN_RIGHT | wx.UP | wx.RIGHT, border=5)
 
-        self.__stop_btn.Bind(wx.EVT_BUTTON, lambda _: self.__on_end())
+        self.__stop_btn.Bind(wx.EVT_BUTTON, lambda _: self.__cleanup(True))
         self.Bind(wx.EVT_TIMER, lambda _: self.__check_process(), self.__timer)
 
         self.SetBackgroundColour(Colours.WHITE)
         self.SetSizer(sizer)
-
-    @override
-    def Destroy(self) -> bool:
-        DuplicateResult(self.GetParent())
-        return super().Destroy()
 
     @override
     def Show(self, show: bool = True):
@@ -70,12 +64,15 @@ class HashCalculatorWindow(wx.Frame):
 
     def __on_end(self):
         self.__cleanup()
+        self.Destroy()
 
     def __check_process(self) -> None:
         if not HashCalculatorThread.is_alive():
             self.__timer.Stop()
             self.__cleanup()
 
-    def __cleanup(self) -> None:
+    def __cleanup(self, cancel: bool = False) -> None:
         HashCalculatorThread.join(0.5)
+        if not cancel:
+            DuplicateResult(self.GetParent())
         self.Destroy()

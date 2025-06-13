@@ -2,6 +2,9 @@ from pydantic import BaseModel, Field
 
 
 class TranslationModel(BaseModel):
+    """
+    Модель с переводом всех надписей программы
+    """
     main_title: str = Field(..., alias='mainTitle', frozen=True)
     create_label: str = Field(..., alias='create', frozen=True)
     back_label: str = Field(..., alias='back', frozen=True)
@@ -40,3 +43,7 @@ class TranslationModel(BaseModel):
     hash_window_title: str = Field(..., alias='hashWindowTitle', frozen=True)
     access_denied_title: str = Field(..., alias='accessDeniedTitle', frozen=True)
     access_denied_text: str = Field(..., alias='accessDeniedText', frozen=True)
+    new_folder_template: str = Field(..., alias='newFolderTemplate', frozen=True)
+    new_folder_label: str = Field(..., alias='newFolder', frozen=True)
+    new_document_template: str = Field(..., alias='newDocumentTemplate', frozen=True)
+    new_document_label: str = Field(..., alias='newDocument', frozen=True)

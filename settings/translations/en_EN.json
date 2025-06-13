@@ -37,4 +37,8 @@
   "hashWindowTitle": "Hash calculation",
   "accessDeniedTitle": "BEBOP",
   "accessDeniedText": "Access Denied :("
+  "newFolderTemplate": "New\\sfolder\\s?\\d?",
+  "newFolder": "New folder {}",
+  "newDocumentTemplate": "Document\\s?\\d?{}",
+  "newDocument": "Document {}"
 }

@@ -37,7 +37,7 @@ if __name__ == '__main__':
     #IconManipulators.init(IconManipulatorID.SYSTEM, PathHelper.icons_path() + '/system', 100, False)
 
     # окно приложения
-    frame = MainWindow(id=WindowID.MAIN_WINDOW, style=settings.settings().MAIN_WINDOW_STYLE)
+    frame = MainWindow(id=WindowID.MAIN_WINDOW)
 
     # показываем окно и запускаем основной цикл приложения
     frame.show()

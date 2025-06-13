@@ -11,7 +11,7 @@ import wx
 
 
 class MainWindow(wx.Frame):
-    def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY) -> None:
+    def __init__(self, *, parent: wx.Window | None = None, id: int = wx.ID_ANY) -> None:
         super().__init__(parent=parent, id=id)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
         self.SetSize(wx.Size(*settings.settings().main_window_size))
@@ -37,8 +37,8 @@ class MainWindow(wx.Frame):
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
         #TODO открытые директории тоже надо сохранять в настройках
-        self.__left_panel.set_filepath('C:/Users/Prosto_Den/Desktop')
-        self.__right_panel.set_filepath('C:/')
+        self.__left_panel.set_filepath(settings.left_panel_path)
+        self.__right_panel.set_filepath(settings.right_panel_path)
 
         # настраиваем FileViewer
         #TODO зачем я настраиваю FileViewer тут? Это же можно делать внутри панели

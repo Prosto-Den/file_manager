@@ -6,13 +6,44 @@ from framework.utils.file_system import FileSystem as _FileSystem
 from framework.singleton.singleton import Singleton as _Singleton
 from typing import Final
 import os
+from pathlib import Path
+
+
+class ClassProperty:
+    """
+    поскольку в питоне класс проперти начиная с версии 3.11 считаются deprecated,
+    вот кастомный класспроперти, по сути использование как с обычными @property,
+    чтобы это управление полями класса Settings было более pythonic way (вайя)
+    """
+    def __init__(self, fget=None, fset=None):
+        self.__fget = fget
+        self.__fset = fset
+
+    def __get__(self, instance, owner):
+        if not self.__fget:
+            raise AttributeError("can't get attribute")
+        return self.__fget(owner)
+
+    def __set__(self, instance, value):
+        if not self.__fset:
+            raise AttributeError("can't set attribute")
+        return self.__fset(type(instance) if instance else instance, value)
+
+    def setter(self, fset):
+        self.__fset = fset
+        return self
+
+def classproperty(func):
+    return ClassProperty(fget=func)
 
 
 class Settings(metaclass=_Singleton):
     __SETTINGS_FILE: Final[str] = 'settings.json'
-    __translation_model: _TranslationModel = None
-    __settings_model: _SettingsModel = None
-    __current_language: str = None
+    __translation_model: _TranslationModel | None = None
+    __settings_model: _SettingsModel | None = None
+    __current_language: str | None = None
+    __left_panel_path: str | None = None
+    __right_panel_path: str | None = None
 
     #TODO вынести настройки в json файл, создать модель
     @classmethod
@@ -35,6 +66,24 @@ class Settings(metaclass=_Singleton):
                                                                                  cls.current_language()),
                                                                                  _TranslationModel)
         return cls.__translation_model
+
+    @classproperty
+    def left_panel_path(cls) -> str:
+        if cls.__left_panel_path is None:
+            if os.name == "nt":
+                cls.__left_panel_path = "C:"
+            else:
+                cls.__left_panel_path = "/"
+
+        return cls.__left_panel_path
+
+    @classproperty
+    def right_panel_path(cls) -> str:
+        if cls.__right_panel_path is None:
+            cls.__right_panel_path = str(Path.home())
+
+        return cls.__right_panel_path
+
 
 #TODO когда реализую файл app.py это нужно будет вынести туда
 settings = Settings()

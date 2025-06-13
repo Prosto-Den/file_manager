@@ -8,6 +8,7 @@ from framework.utils.file_system import FileSystem
 from framework.events import EVT_PATH_CHANGED, AddFileToHistoryEvent
 from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
 from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags
+from settings.settings import settings
 import datetime as dt
 import wx
 import re
@@ -53,6 +54,13 @@ class FileViewer(wx.ListCtrl, Observable):
         """
         return self.__file_system
 
+    @staticmethod
+    def is_root_dir(current_path):
+        if os.name == 'nt':
+            return not re.match(r'\w:/\b', current_path)
+        else:
+            return not re.match(r'/\b', current_path)
+
     def update(self) -> None:
         """
         Обновляет содержимое обозревателя файлов
@@ -65,19 +73,24 @@ class FileViewer(wx.ListCtrl, Observable):
         # создаём колонки для виджета. Если текущее положение не в корневой папке,
         # то добавляем кнопку подъёма по директории
         self.__create_columns()
-        #TODO не кроссплатформенный вариант
-        if re.match(r'\w:/\b', current_path):
+        if not self.is_root_dir(current_path):
             self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
-
         # получаем файлы текущей директории. Сортируем их согласно флагу
-        files = self.__file_system.listdir_with_info(self.__file_system.GetPath())
-        self.__sort(files)
+        if not os.access(current_path, os.R_OK):
+            # Здесь по идее должен быть запрос на повышение привелегий (elevate)
+            wx.MessageBox(settings.translation().access_denied_text, settings.translation().access_denied_title)
+            
+            self.Thaw()
+            return
+            
+        files = self.__file_system.listdir_with_info(current_path)
 
+        self.__sort(files)
         # заполняем виджет
         index: int; file: str; size: int; date: dt.datetime
         for index, (file, size, date) in enumerate(files, start=1):
             # определяем абсолютный путь до файла
-            path = FileSystem.path_join(self.__file_system.GetPath(), file)
+            path = FileSystem.path_join(current_path, file)
             is_directory: bool = FileUtils.is_dir(path)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
             # переводим размер файла из байтов в КБ, МБ и прочее

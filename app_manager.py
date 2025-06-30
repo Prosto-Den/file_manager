@@ -22,7 +22,6 @@ class AppManager:
     def init(cls) -> None:
         cls.__settings = Settings()
         cls.__logger = Logger(cls.__settings.instance().logger_format)
-        cls.__resources = xrc.XmlResource(PathHelper.get_ui_file_name())
 
         # подключаем иконки
         icon_size: int = cls.__settings.instance().icon_size

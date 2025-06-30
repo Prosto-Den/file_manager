@@ -1,7 +1,8 @@
 from windows.duplicate_settings_window import DuplicateSettingsWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
-from settings.consts import PANEL_SIZE, DUPLICATE_WINDOW_SIZE
+from settings.consts import PANEL_SIZE, DUPLICATE_WINDOW_SIZE, MAIN_WINDOW_STYLE, MAIN_WINDOW_SIZE
 from windows.duplicate_result_window import DuplicateResult
+from app_manager import AppManager
 from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
 from widgets.file_viewer import FileViewer
@@ -14,9 +15,9 @@ class MainWindow(wx.Frame):
     def __init__(self, *, parent: wx.Window = None, id: int = wx.ID_ANY) -> None:
         super().__init__(parent=parent, id=id)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
-        self.SetSize(wx.Size(*settings.settings().main_window_size))
-        self.SetTitle(settings.translation().main_title)
-        self.SetWindowStyle(settings.settings().MAIN_WINDOW_STYLE)
+        self.SetSize(MAIN_WINDOW_SIZE)
+        self.SetTitle(AppManager.settings().translation().main_title)
+        self.SetWindowStyle(MAIN_WINDOW_STYLE)
 
         # настраиваем toolbar
         self.__toolbar: wx.ToolBar = self.CreateToolBar()

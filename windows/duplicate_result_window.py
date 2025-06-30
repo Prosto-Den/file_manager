@@ -1,14 +1,13 @@
-from msilib.schema import Class
-
 import wx.dataview as dv
 import wx
-from typing import override, overload
+from typing import override
 from framework.utils.time_utils import TimeUtils
 from settings.settings import settings
 from settings.enums import Colours
 from database_models.hash import HashModel
 from collections import defaultdict, namedtuple
 from pathlib import Path
+from windows.popup_dataview_window import PopUpDataViewWindow
 
 
 class DuplicateResult(wx.Frame):
@@ -16,17 +15,32 @@ class DuplicateResult(wx.Frame):
         super().__init__(parent)
         self.SetTitle('Результаты поиска')
         self.SetSize(wx.Size(1000, 400))
-        panel = wx.Panel(self)
         sizer = wx.BoxSizer(wx.VERTICAL)
+        btn_sizer = wx.BoxSizer(wx.HORIZONTAL)
 
-        self.__tree = dv.DataViewCtrl(panel, style=dv.DV_VERT_RULES | dv.DV_ROW_LINES | wx.BORDER_THEME)
+        self.__tree = dv.DataViewCtrl(self, style=dv.DV_VERT_RULES | dv.DV_ROW_LINES | wx.BORDER_THEME)
+        self.__popup_menu = PopUpDataViewWindow(self)
         model = DataViewModel()
         self.__fill_tree()
         self.__tree.AssociateModel(model)
 
         sizer.Add(self.__tree, 1, wx.EXPAND)
-        panel.SetSizer(sizer)
+        self.SetSizer(sizer)
         self.Show()
+
+        self.Bind(dv.EVT_DATAVIEW_ITEM_CONTEXT_MENU, self.__swap_items, self.__tree)
+
+    def __swap_items(self, event: dv.DataViewEvent) -> None:
+        #TODO по хорошему бы вызывать контекстное меню, но пока так
+        model: DataViewModel = self.__tree.GetModel()
+        node = model.ItemToObject(event.GetItem())
+
+        if isinstance(node, DuplicateFile):
+            parent = node.parent
+            model.swap_items(parent, node)
+            model.ItemChanged(model.ObjectToItem(parent))
+            model.ItemChanged(model.ObjectToItem(node))
+
 
     @override
     def Destroy(self) -> bool:
@@ -37,24 +51,27 @@ class DuplicateResult(wx.Frame):
         self.__tree.AppendTextColumn('Расположение', 0, width=500)
         self.__tree.AppendTextColumn('Дата изменения', 1, width=200)
         self.__tree.AppendTextColumn('Название', 2, width=200)
-        #self.__tree.AppendTextColumn('Хеш-сумма', 3, width=200)
+        self.__tree.AppendToggleColumn('Выбрать', 3, width=200, mode=dv.DATAVIEW_CELL_ACTIVATABLE)
 
 
 class OriginalFile:
-    def __init__(self, filename: str, modification_date: int, filepath: str, hash_: str) -> None:
+    def __init__(self, filename: str, modification_date: str, filepath: str, hash_: str) -> None:
         self.filename = filename
-        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.instance().time_format)
+        self.modification_date = modification_date
         self.filepath = filepath
         self.hash = hash_
         self.duplicates = []
 
 
 class DuplicateFile:
-    def __init__(self, filename: str, modification_date: int, filepath: str, hash_: str) -> None:
+    def __init__(self, filename: str, modification_date: str, filepath: str, hash_: str, chosen: bool = False,
+                 parent: OriginalFile = None) -> None:
         self.filename = filename
-        self.modification_date = TimeUtils.ns_to_datetime_as_string(modification_date, settings.instance().time_format)
+        self.modification_date = modification_date
         self.filepath = filepath
+        self.chosen = chosen
         self.hash = hash_
+        self.parent = parent
 
 
 class DataViewModel(dv.PyDataViewModel):
@@ -62,11 +79,10 @@ class DataViewModel(dv.PyDataViewModel):
         super().__init__()
         self.items = {}
         self.__prepare_data()
-
         self.Cleared()
 
     def GetColumnCount(self):
-        return 4
+        return 5
 
     @override
     def GetChildren(self, item, children) -> int:
@@ -103,6 +119,14 @@ class DataViewModel(dv.PyDataViewModel):
                     return self.ObjectToItem(original)
 
     @override
+    def SetValue(self, variant, item, col):
+        node = self.ItemToObject(item)
+        if isinstance(node, DuplicateFile):
+            if col == 3:
+                node.chosen = variant
+        return True
+
+    @override
     def GetValue(self, item, col):
         node = self.ItemToObject(item)
 
@@ -117,7 +141,8 @@ class DataViewModel(dv.PyDataViewModel):
             mapper = { 0: node.filepath,
                        1: node.modification_date,
                        2: node.filename,
-                       3: node.hash
+                       3: node.chosen,
+                       4: node.hash
                        }
             return mapper[col]
         else:
@@ -130,21 +155,25 @@ class DataViewModel(dv.PyDataViewModel):
             for index, value in enumerate(self.items):
                 if node == value:
                     colour = Colours.LIGHT_GREEN if index % 2 != 0 else Colours.DARK_GREEN
-                else:
-                    continue
-            attr.SetBackgroundColour(colour)
-            attr.SetBold(True)
+                    attr.SetBackgroundColour(colour)
+                    attr.SetBold(True)
+                    break
             return True
 
         elif isinstance(node, DuplicateFile):
             parent: OriginalFile = self.ItemToObject(self.GetParent(item))
             index = parent.duplicates.index(node)
-            if index % 2 != 0:
-                attr.SetBackgroundColour(Colours.GREY)
-            else:
-                attr.SetBackgroundColour(Colours.WHITE)
+            colour = Colours.GREY if index % 2 != 0 else Colours.WHITE
+            attr.SetBackgroundColour(colour)
             return True
+
         return False
+
+    def swap_items(self, parent: OriginalFile, child: DuplicateFile) -> None:
+        parent.filepath, child.filepath = child.filepath, parent.filepath
+        parent.filename, child.filename = child.filename, parent.filename
+        parent.modification_date, child.modification_date = child.modification_date, parent.modification_date
+
 
     def __prepare_data(self) -> None:
         data = HashModel.select_all_duplicates()
@@ -161,10 +190,12 @@ class DataViewModel(dv.PyDataViewModel):
         # превращаем эти данные в item для дерева
         for item in data_dict.values():
             root = list(item)[0]
-            root_item = OriginalFile(root.name, root.date, root.filepath, root.hash)
+            modification_date = TimeUtils.ns_to_datetime_as_string(root.date, settings.instance().time_format)
+            root_item = OriginalFile(root.name, modification_date, root.filepath, root.hash)
             for i in range(1, len(item)):
                 row = list(item)[i]
-                row_item = DuplicateFile(row.name, row.date, row.filepath, row.hash)
+                modification_date = TimeUtils.ns_to_datetime_as_string(row.date, settings.instance().time_format)
+                row_item = DuplicateFile(row.name, modification_date, row.filepath, row.hash, False, root_item)
                 root_item.duplicates.append(row_item)
             self.items[id(root_item)] = root_item
 

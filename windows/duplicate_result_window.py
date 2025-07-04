@@ -2,7 +2,7 @@ import wx.dataview as dv
 import wx
 from typing import override
 from framework.utils.time_utils import TimeUtils
-from settings.settings import settings
+from app_manager import AppManager
 from settings.enums import Colours
 from database_models.hash import HashModel
 from collections import defaultdict, namedtuple
@@ -190,11 +190,11 @@ class DataViewModel(dv.PyDataViewModel):
         # превращаем эти данные в item для дерева
         for item in data_dict.values():
             root = list(item)[0]
-            modification_date = TimeUtils.ns_to_datetime_as_string(root.date, settings.instance().time_format)
+            modification_date = TimeUtils.ns_to_datetime_as_string(root.date, settings.get_instance().time_format)
             root_item = OriginalFile(root.name, modification_date, root.filepath, root.hash)
             for i in range(1, len(item)):
                 row = list(item)[i]
-                modification_date = TimeUtils.ns_to_datetime_as_string(row.date, settings.instance().time_format)
+                modification_date = TimeUtils.ns_to_datetime_as_string(row.date, settings.get_instance().time_format)
                 row_item = DuplicateFile(row.name, modification_date, row.filepath, row.hash, False, root_item)
                 root_item.duplicates.append(row_item)
             self.items[id(root_item)] = root_item

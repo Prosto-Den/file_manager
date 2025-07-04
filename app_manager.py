@@ -21,10 +21,10 @@ class AppManager:
     @classmethod
     def init(cls) -> None:
         cls.__settings = Settings()
-        cls.__logger = Logger(cls.__settings.instance().logger_format)
+        cls.__logger = Logger(cls.__settings.get_instance().logger_format)
 
         # подключаем иконки
-        icon_size: int = cls.__settings.instance().icon_size
+        icon_size: int = cls.__settings.get_instance().icon_size
         IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                                                     IconManipulatorID.CONTROL_PANEL,
                                                     IconManipulatorID.TOOLBAR],

@@ -1,6 +1,6 @@
 import wx
 import wx.adv
-from settings.settings import settings
+from app_manager import AppManager
 from settings.enums import Colours
 from framework.utils.threads_handler import HashCalculatorThread
 from framework.utils.path_helper import PathHelper
@@ -13,23 +13,24 @@ class HashCalculatorWindow(wx.Frame):
     def __init__(self, parent: wx.Window) -> None:
         super().__init__(parent=parent)
         self.SetSize(wx.Size(400, 150))
-        self.SetTitle(settings.translation().hash_window_title)
+        self.SetTitle(AppManager.settings().translation().hash_window_title)
 
         sizer = wx.BoxSizer(wx.VERTICAL)
 
-        self.__stop_btn = wx.Button(self, label=settings.translation().cancel_label)
+        self.__stop_btn = wx.Button(self, label=AppManager.settings().translation().cancel_label)
         self.__timer = wx.Timer(self)
+        #TODO вынести это в отдельный файл настроек?
         self.__paths = []
         self.__is_recursive = False
 
-        gif_image = wx.adv.AnimationCtrl(self)
-        gif_image.LoadFile(FileSystem.path_join(PathHelper.system_icons_path(), 'loading.gif'),
+        load_image = wx.adv.AnimationCtrl(self)
+        load_image.LoadFile(FileSystem.path_join(PathHelper.system_icons_path(), 'loading.gif'),
                            wx.adv.ANIMATION_TYPE_GIF)
+        load_image.SetBackgroundColour(Colours.WHITE)
+        load_image.Play()
 
-        gif_image.SetBackgroundColour(Colours.WHITE)
-        gif_image.Play()
-
-        sizer.Add(gif_image, flag=wx.ALIGN_CENTER | wx.UP, border=5)
+        sizer.Add(load_image, flag=wx.ALIGN_CENTER | wx.UP, border=5)
+        #TODO добавить перевод
         sizer.Add(wx.StaticText(self, label='Производится поиск, пожалуйста, подождите'),
                   flag=wx.ALIGN_CENTER)
         sizer.Add(self.__stop_btn, flag=wx.ALIGN_RIGHT | wx.UP | wx.RIGHT, border=5)
@@ -58,7 +59,7 @@ class HashCalculatorWindow(wx.Frame):
             return
 
         for path in self.__paths:
-            HashCalculatorThread.create_thread(path, settings.instance().buffer_size, self.__is_recursive)
+            HashCalculatorThread.create_thread(path, AppManager.settings().get_instance().buffer_size, self.__is_recursive)
         HashCalculatorThread.start()
         self.__timer.Start(100)
 

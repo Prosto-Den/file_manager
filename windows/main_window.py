@@ -7,7 +7,6 @@ from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
 from widgets.file_viewer import FileViewer
 from typing import Literal
-from settings.settings import settings
 import wx
 
 

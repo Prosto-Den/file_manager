@@ -2,7 +2,7 @@ from __future__ import annotations
 from settings.enums import WindowID, Colours, FindDuplicateWindowWidgetsID
 from settings.consts import DUPLICATE_WINDOW_STYLE
 from typing import TYPE_CHECKING, override
-from settings.settings import settings
+from app_manager import AppManager
 from framework.utils.widgets_helper import WidgetsHelper
 from windows.hash_calculator_window import HashCalculatorWindow
 from widgets.text_field import TextField
@@ -19,7 +19,7 @@ class DuplicateSettingsWindow(wx.Frame):
                  pos: wx.Point= wx.DefaultPosition,
                  style=DUPLICATE_WINDOW_STYLE, name: str = wx.EmptyString) -> None:
         super().__init__(parent=parent, id=id_, size=size, pos=pos, style=style, name=name)
-        self.SetTitle(settings.translation().duplicate_file_window_title)
+        self.SetTitle(AppManager.settings().translation().duplicate_file_window_title)
 
         main_sizer = wx.BoxSizer(wx.VERTICAL)
         radiobutton_panel = wx.Panel(self)

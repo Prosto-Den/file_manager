@@ -30,10 +30,10 @@ class DuplicateSettingsWindow(wx.Frame):
         #radiobutton_sizer = wx.BoxSizer(wx.VERTICAL)
         radiobutton_sizer = wx.GridBagSizer(5, 5)
         two_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.TWO_DIR_RADIO_BTN,
-                                             label=settings.translation().compare_directories_label)
+                                             label=AppManager.settings().translation().compare_directories_label)
 
         one_dir_radiobutton = wx.RadioButton(radiobutton_panel, id=FindDuplicateWindowWidgetsID.ONE_DIR_RADIO_BTN,
-                                             label=settings.translation().one_directory_label)
+                                             label=AppManager.settings().translation().one_directory_label)
         recursive_checkbox = wx.CheckBox(radiobutton_panel, id=FindDuplicateWindowWidgetsID.RECURSIVE_CHECKBOX,
                                          label='Рекурсивный поиск')
         radiobutton_sizer.Add(two_dir_radiobutton, pos=(0, 0), flag=wx.BOTTOM | wx.LEFT | wx.UP, border=5)
@@ -48,14 +48,14 @@ class DuplicateSettingsWindow(wx.Frame):
 
         # two directories sizer
         self.__two_directories_sizer.Add(wx.StaticText(directories_panel,
-                                                       label=settings.translation().first_directory_label),
+                                                       label=AppManager.settings().translation().first_directory_label),
                                          (0, 0), flag=wx.ALIGN_CENTRE_VERTICAL | wx.LEFT, border=5)
         text_field = TextField(directories_panel, FindDuplicateWindowWidgetsID.FIRST_DIR_INPUT)
         text_field.set_text_field_value(parent.get_panel_filepath('LEFT'))
         self.__two_directories_sizer.Add(text_field, (0, 1), flag=wx.EXPAND | wx.RIGHT,
                                          border=5)
         self.__two_directories_sizer.Add(wx.StaticText(directories_panel,
-                                                       label=settings.translation().second_directory_label),
+                                                       label=AppManager.settings().translation().second_directory_label),
                                          (1, 0), flag=wx.ALIGN_CENTER | wx.LEFT, border=5)
 
         text_field = TextField(directories_panel, FindDuplicateWindowWidgetsID.SECOND_DIR_INPUT)
@@ -66,7 +66,7 @@ class DuplicateSettingsWindow(wx.Frame):
 
         # one directory sizer
         self.__one_directory_sizer.Add(wx.StaticText(directories_panel,
-                                                     label=settings.translation().directory_label), (0, 0),
+                                                     label=AppManager.settings().translation().directory_label), (0, 0),
                                        flag=wx.ALIGN_CENTER | wx.LEFT, border=5)
 
         text_field = TextField(directories_panel, FindDuplicateWindowWidgetsID.DIR_INPUT)
@@ -79,8 +79,8 @@ class DuplicateSettingsWindow(wx.Frame):
 
         # sizer для кнопок
         button_sizer = wx.BoxSizer(wx.HORIZONTAL)
-        ok_btn = wx.Button(buttons_panel, label=settings.translation().ok_label)
-        cancel_btn = wx.Button(buttons_panel, label=settings.translation().cancel_label)
+        ok_btn = wx.Button(buttons_panel, label=AppManager.settings().translation().ok_label)
+        cancel_btn = wx.Button(buttons_panel, label=AppManager.settings().translation().cancel_label)
         button_sizer.Add(ok_btn, flag=wx.UP, border=5)
         button_sizer.Add(cancel_btn, flag=wx.UP, border=5)
 

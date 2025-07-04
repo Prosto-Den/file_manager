@@ -1,6 +1,7 @@
 import wx
 from windows.main_window import MainWindow
 from app_manager import AppManager
+from typing import override
 from settings.enums import WindowID
 from wx import xrc
 
@@ -18,11 +19,13 @@ class App(wx.App):
         #self.__main_window = AppManager.resources().LoadFrame(None, 'MainWindow')
         #res = xrc.XmlResource('ui/main_window.xml')
         self.__main_window = MainWindow()
-        self.__main_window.Show(True)
 
-    def mainloop(self):
-        self.MainLoop()
+    @override
+    def MainLoop(self) -> None:
+        self.__main_window.Show()
+        super().MainLoop()
+        # код ниже выполнится после закрытия приложения
         AppManager.shutdown_JVM()
         # Сохраняем скопированные данные в буфере
-        #TODO может быть стоит сделать флаг в настройках на сохранение буфера
+        # TODO может быть стоит сделать флаг в настройках на сохранение буфера
         wx.Clipboard.Get().Flush()

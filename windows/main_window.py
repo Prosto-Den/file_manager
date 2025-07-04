@@ -6,7 +6,7 @@ from app_manager import AppManager
 from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
 from widgets.file_viewer import FileViewer
-from typing import Literal
+from typing import Literal, override
 import wx
 
 
@@ -31,8 +31,6 @@ class MainWindow(wx.Frame):
         self.__toolbar.AddTool(settings_btn)
 
         # создаём панели с виджетами
-        #TODO разобраться с передачей size из настроек (а может вообще лучше передавать размер родителя,
-        # а внутри уже считать, как надо)
         self.__left_panel = MainPanel(parent=self, id_=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
 
@@ -65,11 +63,11 @@ class MainWindow(wx.Frame):
         self.SetSizer(sizer)
         self.Layout()
 
-    def show(self) -> None:
+    @override
+    def Show(self, show: bool = True) -> None:
         self.Center()
-        self.Show(True)
         self.__toolbar.Realize()
-        #self.__statusbar.Show(True)
+        super().Show(show)
 
     def get_panel_filepath(self, panel_side: Literal['LEFT', 'RIGHT']) -> str:
         if panel_side == 'LEFT':

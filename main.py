@@ -5,7 +5,7 @@ from app import App
 if __name__ == '__main__':
     # приложение
     app = App()
-    app.mainloop()
+    app.MainLoop()
 
     # #TODO потом вынести в класс app
     # clipboard = wx.Clipboard.Get()

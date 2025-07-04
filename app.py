@@ -1,12 +1,13 @@
-import wx
 from windows.main_window import MainWindow
 from app_manager import AppManager
 from typing import override
-from settings.enums import WindowID
-from wx import xrc
+import wx
 
 
 class App(wx.App):
+    """
+    Класс приложения
+    """
     def __init__(self, *, redirect: bool = False, filename: str = None,
                  use_best_visual: bool = False, clear_sig_int: bool = True) -> None:
         super().__init__(redirect=redirect, filename=filename, useBestVisual=use_best_visual, clearSigInt=clear_sig_int)
@@ -28,4 +29,4 @@ class App(wx.App):
         AppManager.shutdown_JVM()
         # Сохраняем скопированные данные в буфере
         # TODO может быть стоит сделать флаг в настройках на сохранение буфера
-        wx.Clipboard.Get().Flush()
+        # wx.Clipboard.Get().Flush()

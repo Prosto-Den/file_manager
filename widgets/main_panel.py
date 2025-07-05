@@ -64,9 +64,9 @@ class MainPanel(wx.Panel):
 
     def __create(self, event: CreateEvent) -> None:
         if event.type == CreateItemsID.FOLDER:
-            self.__file_viewer.file_system.create_folder()
+            self.__file_viewer.file_system.create_folder(self.get_filepath())
         else:
-            self.__file_viewer.file_system.create_file(event.file_type)
+            self.__file_viewer.file_system.create_file(self.get_filepath(), event.file_type)
         # match event.type:
         #     case CreateItemsID.FOLDER:
         #         self.__file_viewer.file_system.create_folder(self.__control_panel.current_filepath)

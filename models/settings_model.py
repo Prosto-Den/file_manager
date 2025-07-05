@@ -10,3 +10,5 @@ class SettingsModel(BaseModel):
     time_format: str = Field(..., alias='timeFormat')
     logger_format: str = Field(..., alias='loggerFormat')
     icon_size: int = Field(..., alias='iconSize')
+    left_panel_path: str = Field(..., alias='leftPanelPath')
+    right_panel_path: str = Field(..., alias = 'rightPanelPath')

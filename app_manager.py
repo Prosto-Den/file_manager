@@ -1,30 +1,31 @@
-from settings.settings import Settings
-from framework.logger.logger import Logger
+from settings.settings import Settings as _Settings
+from framework.logger.logger import Logger as _Logger
 from framework.utils.path_helper import PathHelper
 from settings.enums import IconManipulatorID
 from settings.icon_manipulators import IconManipulators
 from framework.database.database import Database
+from framework.utils.classproperty import classproperty
+from typing_extensions import deprecated
 from database_models.hash import HashModel
 import jpype
 from wx import xrc
-import wx
 
 
 class AppManager:
     """
     Класс для управления приложением
     """
-    __settings: Settings = None
-    __logger: Logger = None
+    Settings: _Settings = None
+    Logger: _Logger = None
     __resources: xrc.XmlResource = None
 
     @classmethod
     def init(cls) -> None:
-        cls.__settings = Settings()
-        cls.__logger = Logger(cls.__settings.get_instance().logger_format)
+        cls.Settings = _Settings()
+        cls.Logger = _Logger(cls.Settings.get_instance().logger_format)
 
         # подключаем иконки
-        icon_size: int = cls.__settings.get_instance().icon_size
+        icon_size: int = cls.Settings.get_instance().icon_size
         IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                                                     IconManipulatorID.CONTROL_PANEL,
                                                     IconManipulatorID.TOOLBAR],
@@ -35,18 +36,20 @@ class AppManager:
                                    masks=[False] * 3)
 
     @classmethod
-    def settings(cls) -> Settings:
+    @deprecated("Use Settings instead", stacklevel=2)
+    def settings(cls) -> _Settings:
         """
         Получить настройки приложения
         """
-        return cls.__settings
+        return cls.Settings
 
     @classmethod
-    def logger(cls) -> Logger:
+    @deprecated("Use Logger instead", stacklevel=2)
+    def logger(cls) -> _Logger:
         """
         Получить логгер
         """
-        return cls.__logger
+        return cls.Logger
 
     @classmethod
     def resources(cls) -> xrc.XmlResource:

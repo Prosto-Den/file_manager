@@ -5,17 +5,19 @@ from windows.duplicate_result_window import DuplicateResult
 from app_manager import AppManager
 from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
-from widgets.file_viewer import FileViewer
 from typing import Literal, override
 import wx
 
 
 class MainWindow(wx.Frame):
-    def __init__(self, *, parent: wx.Window | None = None, id: int = wx.ID_ANY) -> None:
-        super().__init__(parent=parent, id=id)
+    def __init__(self) -> None:
+        """
+        Главное окно приложения
+        """
+        super().__init__(parent=None, id=wx.ID_ANY)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
         self.SetSize(MAIN_WINDOW_SIZE)
-        self.SetTitle(AppManager.settings().translation().main_title)
+        self.SetTitle(AppManager.Settings.translation().main_title)
         self.SetWindowStyle(MAIN_WINDOW_STYLE)
 
         # настраиваем toolbar
@@ -33,18 +35,8 @@ class MainWindow(wx.Frame):
         # создаём панели с виджетами
         self.__left_panel = MainPanel(parent=self, id_=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
-
-        #TODO открытые директории тоже надо сохранять в настройках
-        self.__left_panel.set_filepath(AppManager.settings().left_panel_path)
-        self.__right_panel.set_filepath(AppManager.settings().right_panel_path)
-
-        # настраиваем FileViewer
-        #TODO зачем я настраиваю FileViewer тут? Это же можно делать внутри панели
-        file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
-        file_viewer: FileViewer = self.__left_panel.file_viewer
-        file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
-        file_viewer = self.__right_panel.file_viewer
-        file_viewer.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
+        self.__left_panel.set_filepath(AppManager.Settings.left_panel_path)
+        self.__right_panel.set_filepath(AppManager.Settings.right_panel_path)
 
         # настраиваем статус бар
         #self.__statusbar: wx.StatusBar = self.CreateStatusBar()
@@ -65,11 +57,28 @@ class MainWindow(wx.Frame):
 
     @override
     def Show(self, show: bool = True) -> None:
+        """
+        Переопределённый метод Show(). Сначала центрируем окно и создаём toolbar, затем уже показываем окно
+        :param show: True - показать окно, False - спрятать окно
+        """
         self.Center()
-        self.__toolbar.Realize()
+        self.__toolbar.Realize() if show else self.__toolbar.Hide()
         super().Show(show)
 
+    @override
+    def Destroy(self) -> bool:
+        """
+        Переопределённый метод Destroy(). Сначала сохраняем текущие пути виджетов, затем уничтожаем окно
+        """
+        AppManager.settings().save_panel_path(self.get_panel_filepath('LEFT'), self.get_panel_filepath('RIGHT'))
+        return super().Destroy()
+
     def get_panel_filepath(self, panel_side: Literal['LEFT', 'RIGHT']) -> str:
+        """
+        Получить текущий путь панели
+        :param panel_side: 'LEFT' - получить путь левой панели, 'RIGHT' - получить путь правой панели
+        :return: Путь к текущей директории панели
+        """
         if panel_side == 'LEFT':
             return self.__left_panel.get_filepath()
         elif panel_side == 'RIGHT':
@@ -77,6 +86,8 @@ class MainWindow(wx.Frame):
         raise ValueError('Incorrect panel side')
 
     def __find_duplicates(self) -> None:
+        """
+        Открыть окно настройки поиска дубликатов
+        """
         self.Disable()
         DuplicateSettingsWindow(parent=self, size=DUPLICATE_WINDOW_SIZE)
-        #DuplicateResult(self)

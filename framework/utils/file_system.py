@@ -2,6 +2,7 @@ from framework.utils.file_utils import FileUtils
 from framework.utils.time_utils import TimeUtils
 from framework.events import PathChanged
 import datetime as dt
+from typing_extensions import deprecated
 import string
 import wx
 import os
@@ -151,6 +152,7 @@ class FileSystem(wx.FileSystem):
 
     #TODO заменить все использования этого метода аналогичным из PathHelper
     @staticmethod
+    @deprecated("Use PathHelper.join() instead", category=DeprecationWarning)
     def path_join(*args: str) -> str:
         root, *other = args
         path = os.path.join(root, *other)

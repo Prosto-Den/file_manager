@@ -27,6 +27,7 @@ class App(wx.App):
         super().MainLoop()
         # код ниже выполнится после закрытия приложения
         AppManager.shutdown_JVM()
+        AppManager.Settings.save_settings()
         # Сохраняем скопированные данные в буфере
         # TODO может быть стоит сделать флаг в настройках на сохранение буфера
         # wx.Clipboard.Get().Flush()

@@ -5,11 +5,13 @@ from windows.popup_menu import PopUpMenu
 from framework.observer.observable import Observable
 from framework.utils import FileUtils
 from framework.utils.file_system import FileSystem
+from settings.icon_manipulators import IconManipulators
 from framework.events import EVT_PATH_CHANGED, AddFileToHistoryEvent
 from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
-from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags
+from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, IconManipulatorID
 from app_manager import AppManager
 import datetime as dt
+import platform
 import wx
 import re
 import os
@@ -27,6 +29,10 @@ class FileViewer(wx.ListCtrl, Observable):
         Observable.__init__(self)
 
         self.SetSize(parent.GetSize())
+
+        # подключаем иконки
+        file_viewer_icons = IconManipulators.get_icon_manipulator(IconManipulatorID.FILE_VIEWER)
+        self.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
 
         self.__file_system = FileSystem(self, __file__)
         self.__sort_flag = SortFlags.BY_NAME
@@ -56,7 +62,7 @@ class FileViewer(wx.ListCtrl, Observable):
 
     @staticmethod
     def is_root_dir(current_path):
-        if os.name == 'nt':
+        if platform.system() == 'Windows':
             return not re.match(r'\w:/\b', current_path)
         else:
             return not re.match(r'/\b', current_path)

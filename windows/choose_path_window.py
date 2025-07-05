@@ -11,11 +11,11 @@ class ChoosePathWindow(TreeViewWindow):
                  style=wx.DEFAULT_FRAME_STYLE, name: str = wx.EmptyString) -> None:
         super().__init__(parent=parent, id=id, size=size, pos=pos, style=style, name=name)
         self._init()
-        self.SetTitle(AppManager.settings().translation().choose_directory)
+        self.SetTitle(AppManager.Settings.translation().choose_directory)
 
-        self._set_current_file_label_text(AppManager.settings().translation().current_directory)
-        self._set_label_text(AppManager.settings().translation().chosen_directory)
-        self._set_perform_button_label(AppManager.settings().translation().choose_label)
+        self._set_current_file_label_text(AppManager.Settings.translation().current_directory)
+        self._set_label_text(AppManager.Settings.translation().chosen_directory)
+        self._set_perform_button_label(AppManager.Settings.translation().choose_label)
 
     @override
     def _perform(self) -> None:

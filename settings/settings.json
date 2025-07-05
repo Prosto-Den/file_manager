@@ -1,7 +1,9 @@
 {
-  "bufferSize": 131072000,
-  "currentLanguage": "ru_RU",
-  "timeFormat": "%d.%m.%Y %H:%M",
-  "loggerFormat": "%(asctime)s [%(name)s] [%(levelname)-5.5s]  %(message)s",
-  "iconSize": 24
+    "bufferSize": 131072000,
+    "currentLanguage": "ru_RU",
+    "timeFormat": "%d.%m.%Y %H:%M",
+    "loggerFormat": "%(asctime)s [%(name)s] [%(levelname)-5.5s]  %(message)s",
+    "iconSize": 24,
+    "leftPanelPath": "",
+    "rightPanelPath": ""
 }

@@ -4,6 +4,6 @@
     "timeFormat": "%d.%m.%Y %H:%M",
     "loggerFormat": "%(asctime)s [%(name)s] [%(levelname)-5.5s]  %(message)s",
     "iconSize": 24,
-    "leftPanelPath": "",
-    "rightPanelPath": ""
+    "leftPanelPath": "C:/",
+    "rightPanelPath": "C:/"
 }

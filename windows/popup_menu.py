@@ -1,30 +1,33 @@
-import wx
-import os
+from framework.utils.path_helper import PathHelper
 from settings.enums import PopUpItemsID
 from windows.rename_window import RenameWindow
 from windows.move_file_window import MoveFileWindow
 from windows.copy_file_window import CopyFileWindow
-from settings.consts import ICON_SIZE, MOVE_WINDOW_SIZE
+from settings.consts import MOVE_WINDOW_SIZE
 from framework.utils.file_system import FileSystem
 from framework.utils.file_utils import FileUtils
 from windows.base_windows import TreeViewType
 from app_manager import AppManager
+import wx
 
 
+#TODO расписать документацию
 class PopUpMenu(wx.PopupTransientWindow):
     def __init__(self, parent: wx.Window, event: wx.ListEvent,
                  flags: int = wx.BORDER_NONE) -> None:
         super().__init__(parent=parent, flags=flags)
+
         self.__menu = wx.ListCtrl(parent=self, style=wx.LC_REPORT | wx.LC_NO_HEADER | wx.LC_HRULES)
         self.__event: wx.ListEvent = event.Clone()
         self.__filepath = None
         self.__menu.AppendColumn('', width=100)
-        self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, AppManager.settings().translation().delete_label)
-        self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, AppManager.settings().translation().rename_label)
-        self.__menu.InsertItem(PopUpItemsID.MOVE_INTO_BTN, AppManager.settings().translation().move_to_popup_label)
-        self.__menu.InsertItem(PopUpItemsID.COPY_INTO_BTN, AppManager.settings().translation().copy_to_popup_label)
-        self.__menu.InsertItem(PopUpItemsID.COPY_BTN, AppManager.settings().translation().copy_label)
+        self.__menu.InsertItem(PopUpItemsID.DELETE_BTN, AppManager.Translation.delete_label)
+        self.__menu.InsertItem(PopUpItemsID.RENAME_BTN, AppManager.Translation.rename_label)
+        self.__menu.InsertItem(PopUpItemsID.MOVE_INTO_BTN, AppManager.Translation.move_to_popup_label)
+        self.__menu.InsertItem(PopUpItemsID.COPY_INTO_BTN, AppManager.Translation.copy_to_popup_label)
+        self.__menu.InsertItem(PopUpItemsID.COPY_BTN, AppManager.Translation.copy_label)
 
+        # подписываемся на события
         self.__menu.Bind(event=wx.EVT_LIST_ITEM_SELECTED, handler=self.__perform)
 
 
@@ -43,9 +46,9 @@ class PopUpMenu(wx.PopupTransientWindow):
                 item_id: int = list_ctrl.GetFirstSelected()
                 while item_id != -1:
                     item_text: str = list_ctrl.GetItem(item_id).GetText()
-                    item_filepath = FileSystem.path_join(self.__filepath, item_text)
+                    item_filepath = PathHelper.join(self.__filepath, item_text)
                     FileUtils.delete_file(item_filepath)
-                    item_id = self.Parent.GetNextSelected(item_id)
+                    item_id = self.GetParent().GetNextSelected(item_id)
 
             # переименование файла
             case PopUpItemsID.RENAME_BTN:
@@ -53,9 +56,9 @@ class PopUpMenu(wx.PopupTransientWindow):
                 item_position = list_ctrl.GetItemPosition(self.__event.GetIndex())
                 position: wx.Point = list_ctrl.ClientToScreen(item_position)
                 # смещаем вправо на размер иконки
-                position = wx.Point(position[0] + ICON_SIZE, position[1])
+                position = wx.Point(position[0] + AppManager.Settings.Instance.icon_size, position[1])
                 RenameWindow(self.GetParent(), position,
-                             FileSystem.path_join(self.__filepath, self.__event.GetText()))
+                             PathHelper.join(self.__filepath, self.__event.GetText()))
 
             # перемещение файла
             case PopUpItemsID.MOVE_INTO_BTN:
@@ -71,9 +74,10 @@ class PopUpMenu(wx.PopupTransientWindow):
             case PopUpItemsID.COPY_BTN:
                 item_id: int = list_ctrl.GetFirstSelected()
                 files = []
+
                 while item_id != -1:
                     item_text: str = list_ctrl.GetItem(item_id).GetText()
-                    item_filepath = FileSystem.path_join(self.__filepath, item_text)
+                    item_filepath = PathHelper.join(self.__filepath, item_text)
                     files.append(item_filepath)
                     item_id = self.Parent.GetNextSelected(item_id)
 

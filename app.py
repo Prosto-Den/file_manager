@@ -4,6 +4,9 @@ from typing import override
 import wx
 
 
+#TODO продумать перезапуск приложения при смене языка
+# возможно можно просто уничтожить MainWindow и создать его по новой
+# или просто перерисовать каждый виджет отдельно
 class App(wx.App):
     """
     Класс приложения
@@ -27,7 +30,7 @@ class App(wx.App):
         super().MainLoop()
         # код ниже выполнится после закрытия приложения
         AppManager.shutdown_JVM()
-        AppManager.Settings.save_settings()
+        AppManager.Settings.Instance.save_settings()
         # Сохраняем скопированные данные в буфере
         # TODO может быть стоит сделать флаг в настройках на сохранение буфера
         # wx.Clipboard.Get().Flush()

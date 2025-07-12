@@ -1,10 +1,10 @@
 from typing import LiteralString, Literal
-from framework.utils.time_utils import TimeUtils
 from framework.utils.hash_calculator import HashCalculator
 import shutil
 import os
 
 
+#TODO написать документацию
 class FileUtils:
     """
     Утилита для взаимодействия с файлами
@@ -23,7 +23,6 @@ class FileUtils:
         else:
             os.remove(filepath)
 
-    #TODO сделать через move?
     @staticmethod
     def rename_file(old_filepath: str | bytes | LiteralString, new_filepath: str | bytes | LiteralString) -> None:
         os.rename(old_filepath, new_filepath)
@@ -71,18 +70,7 @@ class FileUtils:
 
         return f"{size:.2f} {INFO_SIZES[counter]}"
 
+    #TODO не используется, возможно не нужен
     @classmethod
     def is_empty_dir(cls, path: str) -> bool:
         return len(os.listdir(path)) == 0
-
-    @classmethod
-    def read_file(cls, filepath: str, mode: Literal['r', 'rb'] = 'r') -> str | bytes:
-        """
-        Метод для чтения содержимого файла. Метод загружает все данные из файла в память,
-        НЕ ИСПОЛЬЗОВАТЬ ДЛЯ БОЛЬШИХ ФАЙЛОВ!!!
-        :param filepath: Путь к файлу
-        :param mode: Режим чтения. 'r' - читать как есть, 'rb' - читать, как поток байтов
-        :return: Содержимое файла (строка или байты)
-        """
-        with open(filepath, mode) as file:
-            return file.read()

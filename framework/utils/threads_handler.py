@@ -1,6 +1,7 @@
 from database_models.hash import HashModel
 from framework.utils.file_system import FileSystem
 from framework.utils.file_utils import FileUtils
+from framework.utils.path_helper import PathHelper
 from threading import Thread
 import os
 
@@ -36,7 +37,7 @@ class HashCalculatorThread:
         # обходим по всему, что есть в директории (игнорируем папки)
         for current, _, files in os.walk(path):
             for file in files:
-                filepath = FileSystem.path_join(current, file)
+                filepath = PathHelper.join(current, file)
                 modification_date = FileUtils.get_modification_date(filepath)
                 data = HashModel.select_by_filepath(filepath)
 

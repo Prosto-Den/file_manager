@@ -2,6 +2,7 @@ from windows.duplicate_settings_window import DuplicateSettingsWindow
 from settings.enums import ToolID, WidgetID, IconManipulatorID
 from settings.consts import PANEL_SIZE, DUPLICATE_WINDOW_SIZE, MAIN_WINDOW_STYLE, MAIN_WINDOW_SIZE
 from windows.duplicate_result_window import DuplicateResult
+from framework.utils.file_system import FileSystem
 from app_manager import AppManager
 from settings.icon_manipulators import IconManipulators
 from widgets.main_panel import MainPanel
@@ -17,7 +18,7 @@ class MainWindow(wx.Frame):
         super().__init__(parent=None, id=wx.ID_ANY)
         sizer = wx.FlexGridSizer(rows=1, cols=2, hgap=0, vgap=0)
         self.SetSize(MAIN_WINDOW_SIZE)
-        self.SetTitle(AppManager.Settings.translation().main_title)
+        self.SetTitle(AppManager.Translation.main_title)
         self.SetWindowStyle(MAIN_WINDOW_STYLE)
 
         # настраиваем toolbar
@@ -35,8 +36,16 @@ class MainWindow(wx.Frame):
         # создаём панели с виджетами
         self.__left_panel = MainPanel(parent=self, id_=WidgetID.LEFT_MAIN_PANEL, size=PANEL_SIZE)
         self.__right_panel = MainPanel(parent=self, id_=WidgetID.RIGHT_MAIN_PANEL, size=PANEL_SIZE)
-        self.__left_panel.set_filepath(AppManager.Settings.left_panel_path)
-        self.__right_panel.set_filepath(AppManager.Settings.right_panel_path)
+
+        # задаём пути
+        left_panel_path = AppManager.Settings.left_panel_path
+        right_panel_path = AppManager.Settings.right_panel_path
+        if not FileSystem.is_exists(left_panel_path):
+            left_panel_path = FileSystem.get_root_directory()
+        if not FileSystem.is_exists(right_panel_path):
+            right_panel_path = FileSystem.get_root_directory()
+        self.__left_panel.set_filepath(left_panel_path)
+        self.__right_panel.set_filepath(right_panel_path)
 
         # настраиваем статус бар
         #self.__statusbar: wx.StatusBar = self.CreateStatusBar()

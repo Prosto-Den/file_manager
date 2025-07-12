@@ -5,9 +5,9 @@ import os
 
 
 class Logger(metaclass=Singleton):
-    def __init__(self, format: str) -> None:
+    def __init__(self, format_: str) -> None:
         self.__logger = logging.getLogger()
-        self.__format = format
+        self.__format = format_
 
         log_path = os.path.join(PathHelper.root_path(), 'Log', 'log.log')
 
@@ -30,3 +30,6 @@ class Logger(metaclass=Singleton):
 
     def info(self, message: str) -> None:
         self.__logger.info(message)
+
+    def warn(self, message: str) -> None:
+        self.__logger.warning(message)

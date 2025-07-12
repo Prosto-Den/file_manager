@@ -1,11 +1,12 @@
-import wx
-from widgets.control_panel import ControlPanel
-from widgets.file_viewer import FileViewer
 from framework.events import EVT_CREATE, CreateEvent, EVT_PATH_CHANGED, PathChanged, EVT_ADD_FILE_TO_HISTORY, \
     AddFileToHistoryEvent
-from settings.consts import CONTROL_PANEL_SIZE
 from settings.enums import CreateItemsID, WidgetID
+from widgets.control_panel import ControlPanel
+from settings.consts import CONTROL_PANEL_SIZE
+from widgets.file_viewer import FileViewer
+from app_manager import AppManager
 from typing import override
+import wx
 
 
 class MainPanel(wx.Panel):
@@ -64,9 +65,10 @@ class MainPanel(wx.Panel):
 
     def __create(self, event: CreateEvent) -> None:
         if event.type == CreateItemsID.FOLDER:
-            self.__file_viewer.file_system.create_folder(self.get_filepath())
+            self.__file_viewer.file_system.create_folder(self.get_filepath(), AppManager.Translation.new_folder_label)
         else:
-            self.__file_viewer.file_system.create_file(self.get_filepath(), event.file_type)
+            filename = ''.join((AppManager.Translation.new_document_label, event.file_type))
+            self.__file_viewer.file_system.create_file(self.get_filepath(), filename)
         # match event.type:
         #     case CreateItemsID.FOLDER:
         #         self.__file_viewer.file_system.create_folder(self.__control_panel.current_filepath)

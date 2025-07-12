@@ -4,28 +4,32 @@ from framework.utils.path_helper import PathHelper
 from settings.enums import IconManipulatorID
 from settings.icon_manipulators import IconManipulators
 from framework.database.database import Database
-from framework.utils.classproperty import classproperty
 from typing_extensions import deprecated
 from database_models.hash import HashModel
 import jpype
 from wx import xrc
+from models.translation_model import TranslationModel as _TranslationModel
+from settings.translation import TranslationUtil
 
 
 class AppManager:
     """
     Класс для управления приложением
     """
-    Settings: _Settings = None
+    Settings: _Settings = None # настройки приложения
+    Translation: _TranslationModel = None
     Logger: _Logger = None
-    __resources: xrc.XmlResource = None
+    #TODO разобраться, как перенести интерфейс в xml
+    Resources: xrc.XmlResource = None
 
     @classmethod
     def init(cls) -> None:
         cls.Settings = _Settings()
-        cls.Logger = _Logger(cls.Settings.get_instance().logger_format)
+        cls.Translation = TranslationUtil.get_translation_model(cls.Settings.Instance.current_language)
+        cls.Logger = _Logger(cls.Settings.Instance.logger_format)
 
         # подключаем иконки
-        icon_size: int = cls.Settings.get_instance().icon_size
+        icon_size: int = cls.Settings.Instance.icon_size
         IconManipulators.init_many(manipulator_ids=[IconManipulatorID.FILE_VIEWER,
                                                     IconManipulatorID.CONTROL_PANEL,
                                                     IconManipulatorID.TOOLBAR],
@@ -52,11 +56,12 @@ class AppManager:
         return cls.Logger
 
     @classmethod
+    @deprecated("Use Resources instead", stacklevel=2)
     def resources(cls) -> xrc.XmlResource:
         """
         Получить ресурсы приложения
         """
-        return cls.__resources
+        return cls.Resources
 
     @classmethod
     def connect_to_database(cls):
@@ -68,6 +73,9 @@ class AppManager:
 
     @classmethod
     def close_connection(cls) -> None:
+        """
+        Закрыть соединение с БД
+        """
         Database.disconnect()
 
     @classmethod
@@ -84,3 +92,7 @@ class AppManager:
         """
         if jpype.isJVMStarted():
             jpype.shutdownJVM()
+
+    @classmethod
+    def change_translation(cls, language_code: str) -> None:
+        cls.Translation = TranslationUtil.get_translation_model(language_code)

@@ -1,11 +1,10 @@
 from typing import TypeVar
 import wx
 
-# time format
-TIME_FORMAT = "%d.%m.%Y %H:%M"
 
 # sizes
-ICON_SIZE = 24
+# ICON_SIZE = 24
+#TODO было бы здорово сделать приложение с динамическим интерфейсом, но пока так
 MAIN_WINDOW_SIZE = wx.Size(1095, 900)
 PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, MAIN_WINDOW_SIZE.GetHeight())
 CONTROL_PANEL_SIZE = wx.Size(MAIN_WINDOW_SIZE.GetWidth() // 2, 60)
@@ -15,7 +14,6 @@ DUPLICATE_WINDOW_SIZE = wx.Size(600, 200)
 MOVE_WINDOW_SIZE = wx.Size(450, 500)
 
 # styles
-# TODO записать эти значения в json-файл
 FILE_VIEWER_STYLE = wx.LC_REPORT | wx.LC_HRULES | wx.LC_EDIT_LABELS #| wx.LC_NO_HEADER
 DUPLICATE_WINDOW_STYLE = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX
 MAIN_WINDOW_STYLE = wx.DEFAULT_FRAME_STYLE ^ wx.RESIZE_BORDER ^ wx.MAXIMIZE_BOX

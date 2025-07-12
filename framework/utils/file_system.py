@@ -1,15 +1,18 @@
 from framework.utils.file_utils import FileUtils
 from framework.utils.time_utils import TimeUtils
 from framework.events import PathChanged
+from framework.utils.path_helper import PathHelper
 import datetime as dt
-from typing_extensions import deprecated
 import string
 import wx
 import os
 import re
+import platform
+from pathlib import Path
 
 
 #TODO дописать документацию
+#TODO может быть всё взаимодействие с файловой системой стоит перенести на Java
 class FileSystem(wx.FileSystem):
     def __init__(self, parent: wx.Window, filepath: str) -> None:
         super().__init__()
@@ -29,8 +32,9 @@ class FileSystem(wx.FileSystem):
     @property
     def watcher(self) -> wx.FileSystemWatcher:
         """
-        Наблюдатель отслеживает изменения в файловой системе
-        :return: wx.FileSystemWatcher
+        Наблюдатель.  Нужен для отслеживания изменений в файловой системе (удаление/переименование файлов и т.п.)
+        На изменение директории не реагирует.
+        :return: Наблюдатель (FileSystemWatcher)
         """
         return self.__watcher
 
@@ -43,11 +47,12 @@ class FileSystem(wx.FileSystem):
         self.ChangePathTo(location, True)
         self.__watcher.Add(location)
 
+        # сообщаем родителю об изменении директории
         event = PathChanged()
         wx.PostEvent(self.__parent.GetEventHandler(), event)
 
-    @classmethod
-    def listdir(cls, path: str, is_absolute: bool = False) -> list[str]:
+    @staticmethod
+    def listdir(path: str, is_absolute: bool = False) -> list[str]:
         """
         Возвращает список с названиями файлов, которые расположены в директории
         :param path: Путь к директории
@@ -55,7 +60,7 @@ class FileSystem(wx.FileSystem):
         :return: Список с названиями файлов
         """
         files = os.listdir(path)
-        return files if not is_absolute else [cls.path_join(path, file) for file in files]
+        return files if not is_absolute else [PathHelper.join(path, file) for file in files]
 
     @classmethod
     def listdir_with_info(cls, path: str, is_absolute: bool = False) -> list[tuple[str, int, dt.datetime]]:
@@ -75,6 +80,7 @@ class FileSystem(wx.FileSystem):
 
         return list(zip(files, sizes, dates))
 
+    #TODO нигде не используется, возможно не нужен
     @classmethod
     def get_absolute_path(cls, path: str, file: str) -> str:
         """
@@ -83,65 +89,55 @@ class FileSystem(wx.FileSystem):
         :param file: Название файла
         :return: абсолютный путь к файлу или пустая строка
         """
-        return cls.path_join(path, file) if file in cls.listdir(path) else ''
+        return PathHelper.join(path, file) if file in cls.listdir(path) else ''
 
-    #TODO добавить параметр folder_name, который будем брать из настроек, а тут уже форматировать как надо
+    #TODO придумать, как это дело локализовать
     @classmethod
-    def create_folder(cls, path: str) -> None:
+    def create_folder(cls, path: str, folder_name: str) -> None:
         """
-        Создаёт папку в директории, на которую указывает манипулятор
-        :param path:
+        Создаёт папку в директории
+        :param path: Путь к директории, в которой будет создана папка
+        :param folder_name: Название папки
         """
-        files = [file for file in cls.listdir(path) if re.match(r'Новая\sпапка\s?\d?', file)]
+        re_expression = cls.__create_re_expression(folder_name)
+        files = [file for file in cls.listdir(path) if re.match(re_expression, file)]
         if (length := len(files)) == 0:
-            path = cls.path_join(path, 'Новая папка')
+            path = PathHelper.join(path, folder_name)
         else:
-            path = cls.path_join(path, f'Новая папка {length}')
+            path = PathHelper.join(path, ''.join((folder_name, ' ', str(length))))
         os.mkdir(path)
 
-    #TODO добавить параметр file_name, который будем брать из настроек, а тут уже форматировать как надо
     @classmethod
-    def create_file(cls, path: str, file_format_code: str) -> None:
+    def create_file(cls, path: str, filename: str) -> None:
         """
-        Создаёт файл в директории, на которую указывает манипулятор с заданным расширением
-        :param path:
-        :param file_format_code: Расширение файла
+        Создаёт файл в директории
+        :param path: Полный путь к директории, где будет создан файл
+        :param filename: Название файла
         """
-        files = [file for file in cls.listdir(path) if re.match(rf'Документ\s?\d?{file_format_code}', file)]
+        filepath = Path(filename)
+        name = str(filepath.with_suffix(''))
+        suffix = filepath.suffix
+        re_expression = cls.__create_re_expression(filename)
+        files = [file for file in cls.listdir(path) if re.match(re_expression, file)]
 
         if (length := len(files)) == 0:
-            path = cls.path_join(path, ''.join(('Документ', file_format_code)))
+            path = PathHelper.join(path, filename)
         else:
-            path = cls.path_join(path, ''.join((f'Документ {length}', file_format_code)))
+            path = PathHelper.join(path, ''.join((name, ' ', str(length), suffix)))
 
         file = open(path, 'w')
         file.close()
 
-    #TODO нужен ли этот метод?
     @staticmethod
-    def get_total_file_amount(path: str) -> int:
+    def get_logical_drives() -> tuple[str, ...]:
         """
-        Рекурсивно вычисляет количество файлов в директории и поддиректориях
-        :param path:
-        :return: Количество файлов
-        """
-        result = 0
-
-        for _, _, files in os.walk(path):
-            result += len(files)
-
-        return result
-
-    @staticmethod
-    def get_logical_drives() -> list[str]:
-        """
-        Возвращает все диски буквенные обозначения для информационных носителей.
+        Возвращает буквенные обозначения для информационных носителей.
         Актуально только для Windows
         :return:
         """
-        return ['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))]
+        return tuple(['{}:/'.format(d) for d in string.ascii_uppercase if os.path.exists('{}:'.format(d))])
 
-    #TODO кринжовая функция
+    #TODO надо посмотреть, как нормально работать с буфером обмена
     @staticmethod
     def copy_to_clipboard(filepath: str) -> None:
         clipboard: wx.Clipboard = wx.Clipboard.Get()
@@ -149,14 +145,6 @@ class FileSystem(wx.FileSystem):
         if clipboard.Open():
             clipboard.SetData(wx.TextDataObject(filepath))
             clipboard.Close()
-
-    #TODO заменить все использования этого метода аналогичным из PathHelper
-    @staticmethod
-    @deprecated("Use PathHelper.join() instead", category=DeprecationWarning)
-    def path_join(*args: str) -> str:
-        root, *other = args
-        path = os.path.join(root, *other)
-        return path.replace('\\', '/')
 
     @classmethod
     def is_clipboard_empty(cls) -> bool:
@@ -176,3 +164,32 @@ class FileSystem(wx.FileSystem):
             clipboard.Close()
 
         return files.split(r'\?\\')
+
+    @staticmethod
+    def is_root_dir(current_path: str) -> bool:
+        """
+        Проверяет, является ли указанный путь корнем системы
+        :param current_path: Путь для проверки
+        :return: True, если путь является корнем системы (например, "C:/" для Windows, "/" для Linux),
+                иначе False
+        """
+        if platform.system() == 'Windows':
+            return not (re.match(r'\w:/\b', current_path) or re.match(r"\w:/\W", current_path))
+        else:
+            return not (re.match(r'/\b', current_path) or re.match(r"\w:/\W", current_path))
+
+    @staticmethod
+    def __create_re_expression(filename: str) -> str:
+        path = Path(filename)
+        suffix = path.suffix
+        name = str(path.with_suffix(''))
+        result = name.replace(' ', r'\s?')
+        return ''.join((result, r'\s?.?\d?.?', suffix))
+
+    @staticmethod
+    def is_exists(path: str) -> bool:
+        return os.path.exists(path)
+
+    @staticmethod
+    def get_root_directory() -> str:
+        return "C:/" if platform.system() == 'Windows' else '/'

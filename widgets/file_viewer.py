@@ -7,13 +7,12 @@ from framework.utils import FileUtils
 from framework.utils.file_system import FileSystem
 from settings.icon_manipulators import IconManipulators
 from framework.events import EVT_PATH_CHANGED, AddFileToHistoryEvent
-from settings.consts import POPUP_MENU_SIZE, TIME_FORMAT
+from settings.consts import POPUP_MENU_SIZE
 from settings.enums import FileViewerIconID, FileViewerColumns, SortFlags, IconManipulatorID
 from app_manager import AppManager
 import datetime as dt
-import platform
+from framework.utils.path_helper import PathHelper
 import wx
-import re
 import os
 
 
@@ -35,13 +34,17 @@ class FileViewer(wx.ListCtrl, Observable):
         self.SetImageList(file_viewer_icons, wx.IMAGE_LIST_SMALL)
 
         self.__file_system = FileSystem(self, __file__)
+        #TODO флаг сортировки переместить в настройки
         self.__sort_flag = SortFlags.BY_NAME
 
         # обновляем наполнение виджета
         self.update()
 
         # подключаемся к событиям
+        # EVT_PATH_CHANGED - кастомное событие. Сообщает о смене директории
         self.Bind(event=EVT_PATH_CHANGED, handler=lambda _: self.update())
+        # wx.EVT_FSWATCHER - событие от наблюдателя. Срабатывает, если произошло создание/удаление/переименование
+        # файла
         self.__file_system.watcher.Bind(wx.EVT_FSWATCHER, lambda _: self.update())
         self.Bind(wx.EVT_LIST_ITEM_ACTIVATED, lambda _: self.__open())
         self.Bind(wx.EVT_LIST_ITEM_RIGHT_CLICK, handler=self.__summon_popup_menu)
@@ -60,53 +63,47 @@ class FileViewer(wx.ListCtrl, Observable):
         """
         return self.__file_system
 
-    @staticmethod
-    def is_root_dir(current_path):
-        if platform.system() == 'Windows':
-            return not re.match(r'\w:/\b', current_path)
-        else:
-            return not re.match(r'/\b', current_path)
-
     def update(self) -> None:
         """
         Обновляет содержимое обозревателя файлов
         """
-        self.Freeze()
         # очищаем всё содержимое виджета
+        self.Freeze()
         self.ClearAll()
 
         current_path = self.__file_system.GetPath()
-        # создаём колонки для виджета. Если текущее положение не в корневой папке,
+        # Создаём колонки для виджета. Если текущее положение не в корневой папке,
         # то добавляем кнопку подъёма по директории
         self.__create_columns()
-        if not self.is_root_dir(current_path):
+        if not FileSystem.is_root_dir(current_path):
             self.InsertItem(0, '..', FileViewerIconID.BACK_ICON)
-        # получаем файлы текущей директории. Сортируем их согласно флагу
+
         if not os.access(current_path, os.R_OK):
-            # Здесь по идее должен быть запрос на повышение привелегий (elevate)
-            wx.MessageBox(AppManager.settings().translation().access_denied_text,
-                          AppManager.settings().translation().access_denied_title)
-            
+            # Здесь по идее должен быть запрос на повышение привилегий (elevate)
+            wx.MessageBox(AppManager.Translation.access_denied_text,
+                          AppManager.Translation.access_denied_title)
             self.Thaw()
             return
-            
-        files = self.__file_system.listdir_with_info(current_path)
 
+        # Получаем файлы текущей директории. Сортируем их согласно флагу
+        files = self.__file_system.listdir_with_info(current_path)
         self.__sort(files)
+
         # заполняем виджет
         index: int; file: str; size: int; date: dt.datetime
         for index, (file, size, date) in enumerate(files, start=1):
             # определяем абсолютный путь до файла
-            path = FileSystem.path_join(current_path, file)
+            path = PathHelper.join(current_path, file)
             is_directory: bool = FileUtils.is_dir(path)
             icon_id = FileViewerIconID.FOLDER_ICON if is_directory else FileViewerIconID.FILE_ICON
             # переводим размер файла из байтов в КБ, МБ и прочее
             size_as_bytes = FileUtils.convert_bytes(size) if not is_directory else ''
 
             item_index = self.InsertItem(index, file, icon_id)
-            # выставляем информацию для колонок
+            #TODO можно сделать побольше колонок
+             # выставляем информацию для колонок
             self.SetItem(item_index, 1, str(size_as_bytes))
-            self.SetItem(item_index, 2, date.strftime(TIME_FORMAT))
+            self.SetItem(item_index, 2, date.strftime(AppManager.Settings.Instance.time_format))
 
         # сообщаем подписчикам об обновлении
         self.notify(current_path)
@@ -119,14 +116,10 @@ class FileViewer(wx.ListCtrl, Observable):
         """
         Создать колонки для виджета
         """
-        self.AppendColumn('Имя файла')
-        self.AppendColumn('Размер файла')
-        self.AppendColumn('Дата изменения')
+        self.AppendColumn(AppManager.Translation.filename_column)
+        self.AppendColumn(AppManager.Translation.file_size_column)
+        self.AppendColumn(AppManager.Translation.change_date_column)
         self.__set_default_column_width()
-
-    #TODO я не помню, зачем он нужен, может уже можно удалить
-    # def __get_items_from_column(self, column: int) -> list[str]:
-    #     return [self.GetItemText(index, column) for index in range(1, len(self.__file_system.listdir()))]
 
     def __set_default_column_width(self) -> None:
         """
@@ -173,6 +166,7 @@ class FileViewer(wx.ListCtrl, Observable):
             self.__file_system.change_path_to(filepath)
             self.update()
 
+    #TODO наверное, надо вынести куда-то. Всё-таки это не задача FileViewer'а
     def __change_sort_flag(self, event: wx.ListEvent) -> None:
         """
         Изменить значение флага сортировки
@@ -190,8 +184,10 @@ class FileViewer(wx.ListCtrl, Observable):
                 self.__sort_flag = SortFlags.BY_DATE_DESCENDING if self.__sort_flag == SortFlags.BY_DATE \
                                                                 else self.__sort_flag.BY_DATE
 
+        # сразу же обновляем виджет, чтобы применить сортировку
         self.update()
 
+    #TODO наверное, надо вынести куда-то. Всё-таки это не задача FileViewer'а
     def __sort(self, files: list[tuple[str, int, dt.datetime]]) -> None:
         """
         Отсортировать файлы из директории

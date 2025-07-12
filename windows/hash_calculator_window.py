@@ -24,7 +24,7 @@ class HashCalculatorWindow(wx.Frame):
         self.__is_recursive = False
 
         load_image = wx.adv.AnimationCtrl(self)
-        load_image.LoadFile(FileSystem.path_join(PathHelper.system_icons_path(), 'loading.gif'),
+        load_image.LoadFile(PathHelper.join(PathHelper.system_icons_path(), 'loading.gif'),
                            wx.adv.ANIMATION_TYPE_GIF)
         load_image.SetBackgroundColour(Colours.WHITE)
         load_image.Play()
@@ -59,7 +59,7 @@ class HashCalculatorWindow(wx.Frame):
             return
 
         for path in self.__paths:
-            HashCalculatorThread.create_thread(path, AppManager.settings().get_instance().buffer_size, self.__is_recursive)
+            HashCalculatorThread.create_thread(path, AppManager.Settings.Instance.buffer_size, self.__is_recursive)
         HashCalculatorThread.start()
         self.__timer.Start(100)
 

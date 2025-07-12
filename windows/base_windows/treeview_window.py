@@ -1,5 +1,6 @@
 from framework.utils.file_system import FileSystem
 from framework.utils.file_utils import FileUtils
+from framework.utils.path_helper import PathHelper
 from settings.consts import WHITE
 from typing import Any, TypeVar
 import wx
@@ -73,7 +74,7 @@ class TreeViewWindow(wx.Frame):
             disk = self.__tree_view.AppendItem(root, drive, data=drive)
             files = os.listdir(self.__tree_view.GetItemText(disk))
             for file in files:
-                path = FileSystem.path_join(drive, file)
+                path = PathHelper.join(drive, file)
                 if FileUtils.is_dir(path):
                     self.__tree_view.AppendItem(parent=disk, text=file, data=path)
 
@@ -134,7 +135,7 @@ class TreeViewWindow(wx.Frame):
             try:
                 files: list[str] = os.listdir(child_data)
                 for file in files:
-                    path = FileSystem.path_join(child_data, file)
+                    path = PathHelper.join(child_data, file)
                     if FileUtils.is_dir(path):
                         self.__tree_view.AppendItem(parent=child, text=file, data=path)
 

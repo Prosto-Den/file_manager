@@ -34,11 +34,9 @@
   "fileNameColumn": "Имя файла",
   "fileSizeColumn": "Размер файла",
   "changeDateColumn": "Дата изменения",
+  "hashWindowTitle": "Поиск дубликатов",
   "accessDeniedTitle": "Пып",
   "accessDeniedText": "Нет доступа на чтение директории",
-  "hashWindowTitle": "Поиск дубликатов",
-  "newFolderTemplate": "Новая\\sпапка\\s?\\d?",
-  "newFolder": "Новая папка {}",
-  "newDocumentTemplate": "Документ\\s?\\d?{}",
-  "newDocument": "Документ {}"
+  "newFolder": "Новая папка",
+  "newDocument": "Документ"
 }
